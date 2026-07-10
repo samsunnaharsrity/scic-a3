@@ -57,17 +57,15 @@ const RegisterPage = () => {
       ? "user_free"
       : "artist";
 
-        const handleSubmit = async (
+const handleSubmit = async (
     e: FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault();
 
     const form = new FormData(e.currentTarget);
-
     const name = form.get("name")?.toString().trim() ?? "";
     const email = form.get("email")?.toString().trim() ?? "";
-    const passwordValue =
-      form.get("password")?.toString().trim() ?? "";
+    const passwordValue = form.get("password")?.toString().trim() ?? "";
 
     if (!name || !email || !passwordValue) {
       toast.error("All fields are required");
@@ -91,23 +89,25 @@ const RegisterPage = () => {
         name,
         email,
         password: passwordValue,
-        role,
-        plan,
-        callbackURL: "/",
+        callbackURL: "/", 
+        data: {
+          role,
+          plan,
+        }
       });
 
+
       if (result?.error) {
-        toast.error(
-          result.error.message || "Signup failed"
-        );
+        toast.error(result.error.message || "Signup failed");
         return;
       }
 
-      toast.success("Account created successfully");
+      toast.success("Account created successfully!");
       router.push("/");
-    } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong");
+    } catch (error: any) {
+      console.error("Full Registration Error:", error);
+
+      toast.error(error?.message || "Something went wrong during signup");
     } finally {
       setLoading(false);
     }
@@ -399,11 +399,11 @@ const RegisterPage = () => {
         <div className="reg-card mt-20">
           <div className="card-header">
             <div className="logo-mark">
-              <img
+              {/* <img
                 className="rounded-md"
                 src="/logoIMg.jpeg"
                 alt="Logo"
-              />
+              /> */}
             </div>
 
             <h1>Create Account</h1>

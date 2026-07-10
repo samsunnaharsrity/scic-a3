@@ -92,14 +92,24 @@ export default function ExploreCard({
 
         </div>
 
-        <Link
-          href={`/explore/${place._id}`}
-          className="mt-6"
-        >
-          <button className="w-full rounded-xl bg-green-600 py-3 font-semibold text-white transition hover:bg-green-700">
-            View Details
-          </button>
-        </Link>
+<Link
+  href={`/exploreDetailes/${place._id}`}
+  className="
+    mt-6
+    block
+    w-full
+    rounded-xl
+    bg-green-600
+    py-3
+    text-center
+    font-semibold
+    text-white
+    transition
+    hover:bg-green-700
+  "
+>
+  View Details
+</Link>
 
       </div>
     </article>
