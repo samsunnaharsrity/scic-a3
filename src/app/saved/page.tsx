@@ -67,7 +67,7 @@ export default function SavedFolderPage() {
 
   if (isPending || (user && loading)) {
     return (
-      <div className="mx-auto mt-24 max-w-7xl px-4 py-8 sm:px-6">
+      <div className="mx-auto mt-24 max-w-6xl px-4 py-8 sm:px-6">
         <div className="h-10 w-64 bg-gray-200 animate-pulse rounded-xl mb-8" />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
@@ -106,7 +106,7 @@ export default function SavedFolderPage() {
   }
 
   return (
-    <div className="mx-auto mt-20 max-w-7xl px-4 py-8 sm:px-6 lg:py-12 min-h-[70vh]">
+    <div className="mx-auto mt-20 max-w-6xl px-4 py-8 sm:px-6 lg:py-12 min-h-[70vh]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 border-b pb-6 border-gray-100">
         <div className="flex items-center gap-3.5">
           <div className="p-2.5 rounded-2xl bg-amber-50 text-amber-500 border border-amber-100/60">
@@ -149,16 +149,19 @@ export default function SavedFolderPage() {
             >
               <div>
                 <div className="aspect-[4/3] w-full bg-gray-50 overflow-hidden relative">
+                  {/* ✨ উন্নত ইমেজ ট্যাগ (Styling & Zoom Effect Fixed) */}
                   <img
-                    src={item.imageUrl || "/fallback-image.jpg"}
+                    src={
+                      item.imageUrl ||
+                      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800"
+                    }
                     alt={item.placeName}
-                    className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
-                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   
                   <button
                     onClick={() => handleRemove(item.placeId)}
-                    className="absolute top-3 right-3 bg-white/70 hover:bg-red-50 text-gray-600 hover:text-red-500 p-2 rounded-xl backdrop-blur-md border border-white/40 shadow-sm transition-all duration-200 active:scale-90"
+                    className="absolute top-3 right-3 bg-white/70 hover:bg-red-50 text-gray-600 hover:text-red-500 p-2 rounded-xl backdrop-blur-md border border-white/40 shadow-sm transition-all duration-200 active:scale-90 z-10"
                     title="Remove from saved"
                   >
                     <Trash2 size={15} />
@@ -171,14 +174,16 @@ export default function SavedFolderPage() {
                   </h3>
                   <div className="flex items-center gap-1.5 text-gray-400 mt-2 text-xs">
                     <Calendar size={13} />
-                    <span>Saved: {new Date(item.savedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                    <span>
+                      Saved: {new Date(item.savedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="p-4 pt-0">
                 <Link
-                  href={`/components/explore/${item.placeId}`} 
+                  href={`/exploreDetailes/${item.placeId}`} 
                   className="w-full text-center flex items-center justify-center gap-1.5 bg-gray-50 group-hover:bg-gray-900 text-gray-700 group-hover:text-white text-xs font-bold py-3 rounded-xl transition-all duration-300 border border-gray-100/80 group-hover:border-transparent"
                 >
                   View Details <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" />
