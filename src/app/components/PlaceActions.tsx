@@ -9,7 +9,7 @@ interface PlaceDetailProps {
   placeId: string;
   placeName: string;
   imageUrl?: string;
-  category?: string; // রিলেটেড আইটেম ফিল্টার করার জন্য
+  category?: string; 
 }
 
 export default function PlaceActions({ placeId, placeName, imageUrl, category }: PlaceDetailProps) {
@@ -20,7 +20,7 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  // ১. ইউজার এই পেজে আসলে আইটেমটি অলরেডি সেভড কিনা তা চেক করা (ঐচ্ছিক/অথবা গেট এপিআই দিয়ে করা যায়)
+
   useEffect(() => {
     const checkSavedStatus = async () => {
       if (!user?.email) return;
@@ -36,13 +36,12 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
       }
     };
 
-    // ২. রিলেটেড আইটেম ডাটা ফেচ করা (ক্যাটাগরি অনুযায়ী)
+
     const fetchRelated = async () => {
       try {
-        // আপনার এপিআই অনুযায়ী রিলেটেড ডাটা আনবেন
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/places?category=${category || "all"}`);
         const data = await res.json();
-        // কারেন্ট প্লেস বাদে বাকি ৩টি রিলেটেড প্লেস ফিল্টার করা
+
         const filtered = data.places?.filter((p: any) => p._id !== placeId).slice(0, 3) || [];
         setRelatedItems(filtered);
       } catch (err) {
@@ -54,7 +53,6 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
     fetchRelated();
   }, [placeId, user?.email, category]);
 
-  // ৩. সেভ বাটন হ্যান্ডলার
   const handleSaveToggle = async () => {
     if (!user) return alert("Please log in to save this place.");
     if (saving) return;
@@ -85,7 +83,6 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
 
   return (
     <div className="space-y-8 my-6">
-      {/* 🔖 Save Folder Action Button */}
       <div className="flex items-center justify-between border-b pb-4">
         <h2 className="text-xl font-bold text-gray-900">{placeName}</h2>
         <button
@@ -102,7 +99,6 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
         </button>
       </div>
 
-      {/* 🔗 Related Items with Redirect Link */}
       <div>
         <h3 className="text-md font-semibold text-gray-800 mb-3">Related Items</h3>
         {relatedItems.length === 0 ? (
@@ -112,7 +108,7 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
             {relatedItems.map((item) => (
               <Link 
                 key={item._id} 
-                href={`/places/${item._id}`} // 👈 এখানে রিডাইরেক্ট পাথ সেট করা হয়েছে
+                href={`/places/${item._id}`} // 
                 className="group block border rounded-xl p-3 bg-white shadow-sm hover:shadow-md transition"
               >
                 <div className="aspect-video w-full bg-gray-100 rounded-lg overflow-hidden mb-2">

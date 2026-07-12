@@ -3,6 +3,8 @@ import Navbar from "./components/navbar";
 import Hero from "./components/hero";
 import HomeAbout from "./components/homeAbout";
 import ExploreSection from "./components/explore/exploreSec";
+import CategoryGrid from "./components/explore/categoryGrid";
+import FeaturedStays from "./components/featuredStays";
 
 
 export default function Home() {
@@ -11,7 +13,12 @@ export default function Home() {
       <Navbar></Navbar>
       <Hero></Hero>
       <HomeAbout></HomeAbout>
+      <CategoryGrid limit={4}/>
       <ExploreSection limit={4}></ExploreSection>
+      <FeaturedStays />
+      {/* <Testimonials /> */}
+      {/* <TravelBlogs /> */}
+      {/* <Newsletter /> */}
     </div>
   );
 }

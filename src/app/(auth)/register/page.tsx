@@ -55,7 +55,7 @@ const RegisterPage = () => {
   const plan =
     role === "user"
       ? "user_free"
-      : "artist";
+      : "admin";
 
 const handleSubmit = async (
     e: FormEvent<HTMLFormElement>
@@ -554,74 +554,69 @@ const handleSubmit = async (
                 </p>
               )}
             </div>
-{/* 
-            <div style={{ marginBottom: "1.25rem" }}>
-              <span className="role-label">
-                Account Type
-              </span>
+{/* <div style={{ marginBottom: "1.25rem" }}>
+  <span className="role-label">
+    Account Type
+  </span>
 
-              <div className="role-grid">
-                <div
-                  className={`role-card ${
-                    role === "user"
-                      ? "selected"
-                      : ""
-                  }`}
-                  onClick={() => setRole("user")}
-                >
-                  <div className="role-icon">
-                    <ShoppingBag
-                      size={17}
-                      color={
-                        role === "user"
-                          ? "#16352E"
-                          : "#9ca3af"
-                      }
-                    />
-                  </div>
+  <div className="role-grid">
+    <div
+      className={`role-card ${
+        role === "user" ? "selected" : ""
+      }`}
+      onClick={() => setRole("user")}
+    >
+      <div className="role-icon">
+        <ShoppingBag
+          size={17}
+          color={
+            role === "user"
+              ? "#16352E"
+              : "#9ca3af"
+          }
+        />
+      </div>
 
-                  <span className="role-title">
-                    Buyer
-                  </span>
+      <span className="role-title">
+        User
+      </span>
 
-                  <span className="role-desc">
-                    Browse & collect art
-                  </span>
+      <span className="role-desc">
+        Browse and purchase
+      </span>
 
-                  <div className="role-dot" />
-                </div>
+      <div className="role-dot" />
+    </div>
 
-                <div
-                  className={`role-card ${
-                    role === "artist"
-                      ? "selected"
-                      : ""
-                  }`}
-                  onClick={() => setRole("artist")}
-                >
-                  <div className="role-icon">
-                    <Palette
-                      size={17}
-                      color={
-                        role === "artist"
-                          ? "#16352E"
-                          : "#9ca3af"
-                      }
-                    />
-                  </div>
+    <div
+      className={`role-card ${
+        role === "admin" ? "selected" : ""
+      }`}
+      onClick={() => setRole("admin")}
+    >
+      <div className="role-icon">
+        <Palette
+          size={17}
+          color={
+            role === "admin"
+              ? "#16352E"
+              : "#9ca3af"
+          }
+        />
+      </div>
 
-                  <span className="role-title">
-                    Artist
-                  </span>
+      <span className="role-title">
+        Admin
+      </span>
 
-                  <span className="role-desc">
-                    Sell your creations
-                  </span>
+      <span className="role-desc">
+        Manage the platform
+      </span>
 
-                  <div className="role-dot" />
-                </div>
-              </div>
-            </div> */}
+      <div className="role-dot" />
+    </div>
+  </div>
+</div> */}
 
             <button
               type="submit"
