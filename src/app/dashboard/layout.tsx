@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import DashboardSidebar from "../components/dashboardData/dashboardSidebar";
+
 import { headers } from "next/headers";
+import { DashboardProvider } from "../components/dashboardData/dashboardProvider";
 
 export default async function DashboardLayout({
   children,
@@ -12,12 +14,16 @@ export default async function DashboardLayout({
   });
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <DashboardSidebar session={session} />
+    <DashboardProvider session={session}>
+      <div className="flex min-h-screen bg-gray-50">
 
-      <main className="flex-1 p-6">
-        {children}
-      </main>
-    </div>
+        <DashboardSidebar session={session} />
+
+        <main className="flex-1 p-6">
+          {children}
+        </main>
+
+      </div>
+    </DashboardProvider>
   );
 }

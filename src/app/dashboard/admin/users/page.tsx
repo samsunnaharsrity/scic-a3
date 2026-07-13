@@ -4,7 +4,7 @@ import { Search, Eye, Pencil, Trash2, Loader2, Plus, X } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 
 interface User {
-  id: string | number;
+  id: string;
   name: string;
   email: string;
   role: string;
@@ -17,8 +17,11 @@ export default function ManageUsersPage() {
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
-  // Modal State
+  // Modal & Form State
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [viewUser, setViewUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({ name: "", email: "", role: "user" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -26,20 +29,18 @@ export default function ManageUsersPage() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-const data = await res.json();
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`);
+        const data = await res.json();
 
-console.log(data);
-
-const users = Array.isArray(data)
-  ? data
-  : data.users || data.data || [];
-
-setUsers(users);
-        
+        setUsers(
+          (data.users || []).map((u: any) => ({
+            id: u._id,
+            name: u.name,
+            email: u.email,
+            role: u.role || "user",
+            status: u.banned ? "Blocked" : "Active",
+          }))
+        );
       } catch (error) {
         console.error("Failed to fetch users:", error);
       } finally {
@@ -49,74 +50,111 @@ setUsers(users);
     fetchUsers();
   }, []);
 
-  // Handle Add User Form Submit
-  const handleAddUser = async (e: React.FormEvent) => {
+  // Open Modal for Creating User
+  const handleOpenAddModal = () => {
+    setIsEditMode(false);
+    setSelectedUser(null);
+    setFormData({ name: "", email: "", role: "user" });
+    setIsOpen(true);
+  };
+
+  // Open Modal for Editing User
+  const handleOpenEditModal = (user: User) => {
+    setIsEditMode(true);
+    setSelectedUser(user);
+    setFormData({ name: user.name, email: user.email, role: user.role });
+    setIsOpen(true);
+  };
+
+  // Close Main Modal
+  const handleCloseModal = () => {
+    setIsOpen(false);
+    setIsEditMode(false);
+    setSelectedUser(null);
+    setFormData({ name: "", email: "", role: "user" });
+  };
+
+  // Handle Form Submit (Add or Edit)
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const url = isEditMode
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${selectedUser?.id}`
+      : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`;
+
+    const method = isEditMode ? "PUT" : "POST";
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`, {
-        method: "POST",
+      const response = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           role: formData.role,
-          banned: false, // ডিফল্টভাবে নতুন ইউজার ব্যান্ড হবে না
+          ...(isEditMode ? {} : { banned: false }),
         }),
       });
 
       if (response.ok) {
-        const newUser = await response.json();
-        
-        // স্টেট আপডেট করে নতুন ইউজারকে লিস্টে যোগ করা
-        setUsers((prev) => [
-          ...prev,
-          {
-            id: newUser._id?.$oid || newUser.id || newUser._id,
-            name: newUser.name,
-            email: newUser.email,
-            role: newUser.role,
-            status: "Active",
-          },
-        ]);
+        const resData = await response.json();
 
-        // ফর্ম রিসেট ও মডাল বন্ধ করা
-        setFormData({ name: "", email: "", role: "user" });
-        setIsOpen(false);
-        alert("User added successfully!");
+        if (isEditMode) {
+          // Local State
+          setUsers((prev) =>
+            prev.map((u) =>
+              u.id === selectedUser?.id
+                ? { ...u, name: formData.name, email: formData.email, role: formData.role }
+                : u
+            )
+          );
+          alert("User updated successfully!");
+        } else {
+          // Local State 
+          setUsers((prev) => [
+            ...prev,
+            {
+              id: resData._id || resData.id,
+              name: resData.name,
+              email: resData.email,
+              role: resData.role,
+              status: "Active",
+            },
+          ]);
+          alert("User added successfully!");
+        }
+        handleCloseModal();
       } else {
-        alert("Failed to add user");
+        alert(isEditMode ? "Failed to update user" : "Failed to add user");
       }
     } catch (error) {
-      console.error("Error adding user:", error);
+      console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // Delete User
-// ফ্রন্টএন্ড (ManageUsersPage) এর ডিলিট ফাংশনটি এভাবে পরিবর্তন করুন:
-const handleDeleteUser = async (userId: string | number) => {
-  if (!confirm("Are you sure you want to delete this user?")) return;
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
 
-  startTransition(async () => {
-    try {
-      // `${process.env.NEXT_PUBLIC_API_URL}` যোগ করা হয়েছে যেন ৮০০০ পোর্টে হিট করে
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}`, {
-        method: "DELETE",
-      });
+    startTransition(async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}`, {
+          method: "DELETE",
+        });
 
-      if (response.ok) {
-        setUsers((prevUsers) => prevUsers.filter((u) => u.id !== userId));
-      } else {
-        alert("Failed to delete user");
+        if (response.ok) {
+          setUsers((prevUsers) => prevUsers.filter((u) => u.id !== userId));
+        } else {
+          alert("Failed to delete user");
+        }
+      } catch (error) {
+        console.error("Error deleting user:", error);
       }
-    } catch (error) {
-      console.error("Error deleting user:", error);
-    }
-  });
-};
+    });
+  };
 
   const filteredUsers = users.filter(
     (user) =>
@@ -136,7 +174,6 @@ const handleDeleteUser = async (userId: string | number) => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
-          {/* Search Input */}
           <div className="relative w-full md:w-80">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
@@ -148,9 +185,8 @@ const handleDeleteUser = async (userId: string | number) => {
             />
           </div>
 
-          {/* Add User Button */}
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={handleOpenAddModal}
             className="flex items-center justify-center gap-2 w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-5 rounded-xl transition-colors shadow-sm"
           >
             <Plus size={18} />
@@ -159,7 +195,7 @@ const handleDeleteUser = async (userId: string | number) => {
         </div>
       </div>
 
-      {/* Table & Loading States */}
+      {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
         <div className="overflow-x-auto">
           <table className="w-full text-gray-700 dark:text-neutral-300">
@@ -206,10 +242,16 @@ const handleDeleteUser = async (userId: string | number) => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
-                        <button className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-neutral-800 dark:text-blue-400 dark:hover:bg-neutral-700 transition-colors">
+                        <button 
+                          onClick={() => setViewUser(user)}
+                          className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-neutral-800 dark:text-blue-400 dark:hover:bg-neutral-700 transition-colors"
+                        >
                           <Eye size={16} />
                         </button>
-                        <button className="rounded-lg bg-amber-50 p-2 text-amber-600 hover:bg-amber-100 dark:bg-neutral-800 dark:text-amber-400 dark:hover:bg-neutral-700 transition-colors">
+                        <button 
+                          onClick={() => handleOpenEditModal(user)}
+                          className="rounded-lg bg-amber-50 p-2 text-amber-600 hover:bg-amber-100 dark:bg-neutral-800 dark:text-amber-400 dark:hover:bg-neutral-700 transition-colors"
+                        >
                           <Pencil size={16} />
                         </button>
                         <button
@@ -237,18 +279,20 @@ const handleDeleteUser = async (userId: string | number) => {
         </div>
       </div>
 
-      {/* --- ADD USER MODAL --- */}
+      {/* ADD / EDIT USER MODAL */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b pb-4 dark:border-neutral-800">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add New User</h2>
-              <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-white">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {isEditMode ? "Edit User Details" : "Add New User"}
+              </h2>
+              <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-white">
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleAddUser} className="mt-4 space-y-4">
+            <form onSubmit={handleFormSubmit} className="mt-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300">Name</label>
                 <input
@@ -288,7 +332,7 @@ const handleDeleteUser = async (userId: string | number) => {
               <div className="flex justify-end gap-3 border-t pt-4 mt-6 dark:border-neutral-800">
                 <button
                   type="button"
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleCloseModal}
                   className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                 >
                   Cancel
@@ -298,10 +342,56 @@ const handleDeleteUser = async (userId: string | number) => {
                   disabled={isSubmitting}
                   className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-colors"
                 >
-                  {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : "Save User"}
+                  {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : (isEditMode ? "Update User" : "Save User")}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* VIEW USER DETAILS MODAL */}
+      {viewUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b pb-4 dark:border-neutral-800">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">User Information</h2>
+              <button onClick={() => setViewUser(null)} className="text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-white">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="flex justify-between py-2 border-b dark:border-neutral-800">
+                <span className="font-medium text-gray-500">ID:</span>
+                <span className="text-gray-900 dark:text-white">{viewUser.id}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b dark:border-neutral-800">
+                <span className="font-medium text-gray-500">Name:</span>
+                <span className="text-gray-900 dark:text-white">{viewUser.name}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b dark:border-neutral-800">
+                <span className="font-medium text-gray-500">Email:</span>
+                <span className="text-gray-900 dark:text-white">{viewUser.email}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b dark:border-neutral-800">
+                <span className="font-medium text-gray-500">Role:</span>
+                <span className="capitalize text-gray-900 dark:text-white">{viewUser.role}</span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="font-medium text-gray-500">Status:</span>
+                <span className={`font-semibold ${viewUser.status === "Active" ? "text-green-600" : "text-red-600"}`}>{viewUser.status}</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end border-t pt-4 mt-6 dark:border-neutral-800">
+              <button
+                onClick={() => setViewUser(null)}
+                className="rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 px-5 py-2 text-sm font-medium text-gray-700 dark:text-neutral-300 transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

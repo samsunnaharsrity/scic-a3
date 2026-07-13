@@ -1,10 +1,10 @@
 "use client";
 
-import { Search, Eye, Pencil, Trash2, Loader2, Plus, X, Hotel, MapPin, DollarSign } from "lucide-react";
+import { Search, Eye, Pencil, Trash2, Loader2, Plus, X, Hotel, MapPin } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 
 interface Stay {
-  id: string | number;
+  id: string;
   title: string;
   location: string;
   price: number;
@@ -20,8 +20,12 @@ export default function ManageStaysPage() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // Modal State
+  // Modal & Edit State
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedStayId, setSelectedStayId] = useState<string | null>(null);
+  const [viewStay, setViewStay] = useState<Stay | null>(null);
+  
   const [formData, setFormData] = useState({
     title: "",
     location: "",
@@ -31,104 +35,131 @@ export default function ManageStaysPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // API Base URL Fallback
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   // Fetch Stays
-// Fetch Stays
-useEffect(() => {
-  async function fetchStays() {
-    try {
-      setLoading(true);
-      setApiError(null);
-      
-      const response = await fetch(`${baseUrl}/api/stays`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      
-
-      if (result.success && Array.isArray(result.data)) {
-        const formattedData = result.data.map((s: any) => ({
-          id: s._id?.$oid || s.id || s._id,
-          title: s.title || "Untitled Stay",
-          location: s.location || "Unknown Location",
-          price: Number(s.price) || 0,
-          type: s.type || "Hotel",
-          status: s.available !== false ? "Available" : "Booked",
-          image: s.image || "",
-        }));
+  useEffect(() => {
+    async function fetchStays() {
+      try {
+        setLoading(true);
+        setApiError(null);
         
-        setStays(formattedData);
-      } else {
-        throw new Error("Invalid data format received from server");
-      }
-    } catch (error: any) {
-      console.error("Failed to fetch stays:", error);
-      setApiError(error.message || "Failed to load stays. Please check backend connection.");
-    } finally {
-      setLoading(false);
-    }
-  }
-  fetchStays();
-}, [baseUrl]);
+        const response = await fetch(`${baseUrl}/api/stays`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Server responded with status: ${response.status}`);
+        }
 
-  // Handle Add Stay Submit
-  const handleAddStay = async (e: React.FormEvent) => {
+        const result = await response.json();
+        
+        if (result.success && Array.isArray(result.data)) {
+          const formattedData = result.data.map((s: any) => ({
+            id: s._id || s.id,
+            title: s.title || "Untitled Stay",
+            location: s.location || "Unknown Location",
+            price: Number(s.price) || 0,
+            type: s.type || "Hotel",
+            status: s.available !== false ? "Available" : "Booked",
+            image: s.image || "",
+          }));
+          
+          setStays(formattedData);
+        } else {
+          throw new Error("Invalid data format received from server");
+        }
+      } catch (error: any) {
+        console.error("Failed to fetch stays:", error);
+        setApiError(error.message || "Failed to load stays.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStays();
+  }, [baseUrl]);
+
+  // Open Modal for Add
+  const handleOpenAddModal = () => {
+    setIsEditMode(false);
+    setSelectedStayId(null);
+    setFormData({ title: "", location: "", price: "", type: "Hotel", image: "" });
+    setIsOpen(true);
+  };
+
+  // Open Modal for Edit
+  const handleOpenEditModal = (stay: Stay) => {
+    setIsEditMode(true);
+    setSelectedStayId(stay.id);
+    setFormData({
+      title: stay.title,
+      location: stay.location,
+      price: stay.price.toString(),
+      type: stay.type,
+      image: stay.image || "",
+    });
+    setIsOpen(true);
+  };
+
+  // Form Submit (Add or Edit)
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const url = isEditMode 
+      ? `${baseUrl}/api/admin/stays/${selectedStayId}`
+      : `${baseUrl}/api/admin/stays`;
+    
+    const method = isEditMode ? "PUT" : "POST";
+
     try {
-      const response = await fetch(`${baseUrl}/api/admin/stays`, {
-        method: "POST",
+      const response = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: formData.title,
           location: formData.location,
           price: Number(formData.price),
           type: formData.type,
-          image: formData.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945", // default fallback image
+          image: formData.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945",
           available: true,
         }),
       });
 
       if (response.ok) {
-        const newStay = await response.json();
-        
-        setStays((prev) => [
-          ...prev,
-          {
-            id: newStay._id?.$oid || newStay.id || newStay._id,
-            title: newStay.title,
-            location: newStay.location,
-            price: newStay.price,
-            type: newStay.type,
-            status: "Available",
-            image: newStay.image,
-          },
-        ]);
+        const resData = await response.json();
+        const updatedStayObj = {
+          id: resData._id || resData.id,
+          title: resData.title,
+          location: resData.location,
+          price: resData.price,
+          type: resData.type,
+          status: resData.available !== false ? "Available" : "Booked",
+          image: resData.image,
+        };
 
-        setFormData({ title: "", location: "", price: "", type: "Hotel", image: "" });
+        if (isEditMode) {
+          setStays((prev) => prev.map((s) => (s.id === selectedStayId ? updatedStayObj : s)));
+          alert("Stay updated successfully!");
+        } else {
+          setStays((prev) => [...prev, updatedStayObj]);
+          alert("Stay added successfully!");
+        }
+
         setIsOpen(false);
-        alert("Stay added successfully!");
       } else {
-        alert("Failed to add stay");
+        alert(isEditMode ? "Failed to update stay" : "Failed to add stay");
       }
     } catch (error) {
-      console.error("Error adding stay:", error);
+      console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // Delete Stay
-  const handleDeleteStay = async (stayId: string | number) => {
+  const handleDeleteStay = async (stayId: string) => {
     if (!confirm("Are you sure you want to delete this stay?")) return;
 
     startTransition(async () => {
@@ -160,13 +191,10 @@ useEffect(() => {
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Manage Stays</h1>
-          <p className="mt-1 text-gray-500 dark:text-gray-400">
-            View, add, and manage all hotel rooms and stay listings.
-          </p>
+          <p className="mt-1 text-gray-500 dark:text-gray-400">View, add, and manage all hotel rooms and stay listings.</p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto">
-          {/* Search Input */}
           <div className="relative w-full md:w-80">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
@@ -178,9 +206,8 @@ useEffect(() => {
             />
           </div>
 
-          {/* Add Stay Button */}
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={handleOpenAddModal}
             className="flex items-center justify-center gap-2 w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-5 rounded-xl transition-colors shadow-sm"
           >
             <Plus size={18} />
@@ -214,9 +241,7 @@ useEffect(() => {
                 </tr>
               ) : apiError ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-red-500 font-medium">
-                    {apiError}
-                  </td>
+                  <td colSpan={6} className="py-12 text-center text-red-500 font-medium">{apiError}</td>
                 </tr>
               ) : (
                 filteredStays.map((stay) => (
@@ -240,35 +265,23 @@ useEffect(() => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="rounded-full bg-slate-100 dark:bg-neutral-800 px-2.5 py-1 text-xs font-medium">
-                        {stay.type}
-                      </span>
+                      <span className="rounded-full bg-slate-100 dark:bg-neutral-800 px-2.5 py-1 text-xs font-medium">{stay.type}</span>
                     </td>
-                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                      ${stay.price}
-                    </td>
+                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">${stay.price}</td>
                     <td className="px-6 py-4">
                       <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        stay.status?.toLowerCase() === "available"
-                          ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
-                      }`}>
-                        {stay.status}
-                      </span>
+                        stay.status?.toLowerCase() === "available" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                      }`}>{stay.status}</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
-                        <button className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-neutral-800 dark:text-blue-400 dark:hover:bg-neutral-700 transition-colors">
+                        <button onClick={() => setViewStay(stay)} className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100">
                           <Eye size={16} />
                         </button>
-                        <button className="rounded-lg bg-amber-50 p-2 text-amber-600 hover:bg-amber-100 dark:bg-neutral-800 dark:text-amber-400 dark:hover:bg-neutral-700 transition-colors">
+                        <button onClick={() => handleOpenEditModal(stay)} className="rounded-lg bg-amber-50 p-2 text-amber-600 hover:bg-amber-100">
                           <Pencil size={16} />
                         </button>
-                        <button
-                          disabled={isPending}
-                          onClick={() => handleDeleteStay(stay.id)}
-                          className="rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-neutral-800 dark:text-red-400 dark:hover:bg-neutral-700 transition-colors disabled:opacity-50"
-                        >
+                        <button disabled={isPending} onClick={() => handleDeleteStay(stay.id)} className="rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100 disabled:opacity-50">
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -276,74 +289,37 @@ useEffect(() => {
                   </tr>
                 ))
               )}
-
-              {!loading && !apiError && filteredStays.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-500 dark:text-neutral-400">
-                    No stays found matching your search.
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/*  ADD STAY MODAL  */}
+      {/* ADD / EDIT STAY MODAL */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b pb-4 dark:border-neutral-800">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add New Stay</h2>
-              <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-white">
-                <X size={20} />
-              </button>
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-neutral-900">
+            <div className="flex items-center justify-between border-b pb-4">
+              <h2 className="text-xl font-bold">{isEditMode ? "Edit Stay details" : "Add New Stay"}</h2>
+              <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700"><X size={20} /></button>
             </div>
 
-            <form onSubmit={handleAddStay} className="mt-4 space-y-4">
+            <form onSubmit={handleFormSubmit} className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300">Title / Name</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-green-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white text-sm"
-                  placeholder="e.g. Luxury Ocean View Suite"
-                />
+                <label className="block text-sm font-medium">Title / Name</label>
+                <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="mt-1 w-full rounded-xl border p-3 text-sm" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300">Location</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-green-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white text-sm"
-                  placeholder="e.g. Cox's Bazar, Bangladesh"
-                />
+                <label className="block text-sm font-medium">Location</label>
+                <input type="text" required value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="mt-1 w-full rounded-xl border p-3 text-sm" />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300">Price per Night ($)</label>
-                  <input
-                    type="number"
-                    required
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="mt-1 w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-green-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white text-sm"
-                    placeholder="99"
-                  />
+                  <label className="block text-sm font-medium">Price per Night ($)</label>
+                  <input type="number" required value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} className="mt-1 w-full rounded-xl border p-3 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300">Type</label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="mt-1 w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-green-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white text-sm"
-                  >
+                  <label className="block text-sm font-medium">Type</label>
+                  <select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="mt-1 w-full rounded-xl border p-3 text-sm">
                     <option value="Hotel">Hotel</option>
                     <option value="Apartment">Apartment</option>
                     <option value="Resort">Resort</option>
@@ -351,35 +327,55 @@ useEffect(() => {
                   </select>
                 </div>
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300">Image URL</label>
-                <input
-                  type="url"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="mt-1 w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-green-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white text-sm"
-                  placeholder="https://example.com/image.jpg"
-                />
+                <label className="block text-sm font-medium">Image URL</label>
+                <input type="url" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} className="mt-1 w-full rounded-xl border p-3 text-sm" />
               </div>
 
-              <div className="flex justify-end gap-3 border-t pt-4 mt-6 dark:border-neutral-800">
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-colors"
-                >
+              <div className="flex justify-end gap-3 border-t pt-4 mt-6">
+                <button type="button" onClick={() => setIsOpen(false)} className="rounded-xl border px-4 py-2.5 text-sm">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium">
                   {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : "Save Stay"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* VIEW DETAILS MODAL */}
+      {viewStay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-neutral-900">
+            <div className="flex items-center justify-between border-b pb-4">
+              <h2 className="text-xl font-bold">Stay Information</h2>
+              <button onClick={() => setViewStay(null)} className="text-gray-500"><X size={20} /></button>
+            </div>
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-500">Title:</span>
+                <span className="font-medium">{viewStay.title}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-500">Location:</span>
+                <span className="font-medium">{viewStay.location}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-500">Type:</span>
+                <span className="font-medium">{viewStay.type}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-500">Price / Night:</span>
+                <span className="font-medium">${viewStay.price}</span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-gray-500">Status:</span>
+                <span className={`font-semibold ${viewStay.status === "Available" ? "text-green-600" : "text-amber-600"}`}>{viewStay.status}</span>
+              </div>
+            </div>
+            <div className="flex justify-end border-t pt-4 mt-6">
+              <button onClick={() => setViewStay(null)} className="rounded-xl bg-gray-100 px-5 py-2 text-sm font-medium">Close</button>
+            </div>
           </div>
         </div>
       )}

@@ -1,3 +1,4 @@
+import BookNowButton from "@/app/components/bookNowBtn";
 import CommentSection from "@/app/components/commentSec";
 import ImageGallery from "@/app/components/ImageGallery";
 import RelatedPlaces from "@/app/components/reletedPlace";
@@ -188,6 +189,14 @@ export default async function DetailsPage({ params }: Props) {
               </div>
 
             </div>
+
+              <hr className="my-5 border-gray-200" />
+  <BookNowButton
+    placeId={place._id}
+    placeName={place.title}
+    image={place.image || ""}
+    price={place.price}
+  />
           </div>
         </div>
 
