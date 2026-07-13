@@ -39,7 +39,7 @@ interface Props {
 async function getPlace(id: string): Promise<Place | null> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!baseUrl) {
-    console.error("❌ NEXT_PUBLIC_API_URL is not defined in environment variables.");
+    console.error(" NEXT_PUBLIC_API_URL is not defined in environment variables.");
     return null;
   }
 
@@ -51,14 +51,14 @@ async function getPlace(id: string): Promise<Place | null> {
     });
 
     if (!res.ok) {
-      console.error(`❌ Fetch failed with status: ${res.status}`);
+      console.error(`Fetch failed with status: ${res.status}`);
       return null;
     }
 
     const result = await res.json();
     return result.success ? result.data : null;
   } catch (error) {
-    console.error("❌ Error fetching place details:", error);
+    console.error("Error fetching place details:", error);
     return null;
   }
 }
@@ -157,7 +157,7 @@ export default async function DetailsPage({ params }: Props) {
 
         </div>
 
-        {/* Right Side: Quick Overview Card */}
+        {/* Right Side */}
         <div className="lg:col-span-1">
           <div className="sticky top-8 rounded-2xl border border-gray-200 p-6 shadow-sm bg-white">
             <h2 className="text-xl font-bold text-gray-900 mb-5">Quick Overview</h2>

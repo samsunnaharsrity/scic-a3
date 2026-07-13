@@ -1,20 +1,19 @@
-import { DashboardSidebar } from "../components/dashboardData/dashboardSlidebar";
+import { auth } from "@/lib/auth";
+import DashboardSidebar from "../components/dashboardData/dashboardSidebar";
+import { headers } from "next/headers";
 
-
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = {
-    role: "admin",
-    name: "",
-    email: "",
-  };
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <DashboardSidebar user={user} />
+      <DashboardSidebar session={session} />
 
       <main className="flex-1 p-6">
         {children}

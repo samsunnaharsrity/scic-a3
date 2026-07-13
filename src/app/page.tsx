@@ -15,7 +15,7 @@ export default function Home() {
       <HomeAbout></HomeAbout>
       <CategoryGrid limit={4}/>
       <ExploreSection limit={4}></ExploreSection>
-      <FeaturedStays />
+      {/* <FeaturedStays /> */}
       {/* <Testimonials /> */}
       {/* <TravelBlogs /> */}
       {/* <Newsletter /> */}
