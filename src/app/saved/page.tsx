@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Trash2, FolderHeart, ArrowRight, Calendar, BookmarkX } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -9,7 +9,10 @@ interface SavedItem {
   _id: string;
   placeId: string;
   placeName: string;
-  imageUrl?: string;
+  imageUrl: string;
+  price?: number;
+  location?: string;
+  rating?: number;
   savedAt: string;
 }
 
@@ -21,7 +24,7 @@ export default function SavedFolderPage() {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  const fetchSavedItems = async () => {
+  const fetchSavedItems = useCallback(async () => {
     if (!user?.email) return;
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/save/user/${user.email}`);
@@ -34,13 +37,13 @@ export default function SavedFolderPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.email]);
 
   useEffect(() => {
     if (user?.email) {
       fetchSavedItems();
     }
-  }, [user?.email]);
+  }, [user?.email, fetchSavedItems]);
 
   const handleRemove = async (placeId: string) => {
     if (!user?.email) return;
@@ -58,6 +61,8 @@ export default function SavedFolderPage() {
           setSavedItems((prev) => prev.filter((item) => item.placeId !== placeId));
           setRemovingId(null);
         }, 300);
+      } else {
+        setRemovingId(null);
       }
     } catch (error) {
       console.error("Error removing item:", error);
@@ -149,19 +154,16 @@ export default function SavedFolderPage() {
             >
               <div>
                 <div className="aspect-[4/3] w-full bg-gray-50 overflow-hidden relative">
-                  {/* ✨ উন্নত ইমেজ ট্যাগ (Styling & Zoom Effect Fixed) */}
                   <img
-                    src={
-                      item.imageUrl ||
-                      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800"
-                    }
+                    src={item.imageUrl || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800"}
                     alt={item.placeName}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   
                   <button
                     onClick={() => handleRemove(item.placeId)}
-                    className="absolute top-3 right-3 bg-white/70 hover:bg-red-50 text-gray-600 hover:text-red-500 p-2 rounded-xl backdrop-blur-md border border-white/40 shadow-sm transition-all duration-200 active:scale-90 z-10"
+                    disabled={removingId === item.placeId}
+                    className="absolute top-3 right-3 bg-white/70 hover:bg-red-50 text-gray-600 hover:text-red-500 p-2 rounded-xl backdrop-blur-md border border-white/40 shadow-sm transition-all duration-200 active:scale-90 z-10 disabled:opacity-50"
                     title="Remove from saved"
                   >
                     <Trash2 size={15} />
@@ -182,8 +184,9 @@ export default function SavedFolderPage() {
               </div>
 
               <div className="p-4 pt-0">
+                {/* 🛠️ এখানে ডাইনামিক রাউট পাথটি সংশোধন করা হয়েছে */}
                 <Link
-                  href={`/exploreDetailes/${item.placeId}`} 
+                  href={`/explore/${item.placeId}`} 
                   className="w-full text-center flex items-center justify-center gap-1.5 bg-gray-50 group-hover:bg-gray-900 text-gray-700 group-hover:text-white text-xs font-bold py-3 rounded-xl transition-all duration-300 border border-gray-100/80 group-hover:border-transparent"
                 >
                   View Details <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" />

@@ -73,6 +73,7 @@ export default function ExploreCard({
         <div className="mt-5 flex items-center justify-between">
 
           <div>
+            <span className="text-xs text-gray-400 block font-medium">Per Night</span>
             <p className="text-xl font-bold text-green-600">
               ${place.price}
             </p>

@@ -210,7 +210,7 @@ export default function CategoryPage() {
 
 
           <Link
-            href="/explore"
+            href="/components/explore"
             className="mt-10 inline-flex items-center gap-2 rounded-2xl bg-white px-8 py-4 font-bold text-amber-600 transition-all duration-300 hover:scale-105 hover:bg-gray-100"
           >
             Explore All Destinations

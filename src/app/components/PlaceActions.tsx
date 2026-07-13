@@ -20,7 +20,6 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-
   useEffect(() => {
     const checkSavedStatus = async () => {
       if (!user?.email) return;
@@ -32,20 +31,20 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
           setIsSaved(found);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Error checking save status:", err);
       }
     };
-
 
     const fetchRelated = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/places?category=${category || "all"}`);
         const data = await res.json();
 
+        // Filters out the current place to avoid showing it in the related section
         const filtered = data.places?.filter((p: any) => p._id !== placeId).slice(0, 3) || [];
         setRelatedItems(filtered);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching related items:", err);
       }
     };
 
@@ -83,6 +82,7 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
 
   return (
     <div className="space-y-8 my-6">
+      {/* Action Header */}
       <div className="flex items-center justify-between border-b pb-4">
         <h2 className="text-xl font-bold text-gray-900">{placeName}</h2>
         <button
@@ -99,6 +99,7 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
         </button>
       </div>
 
+      {/* Related Items Section */}
       <div>
         <h3 className="text-md font-semibold text-gray-800 mb-3">Related Items</h3>
         {relatedItems.length === 0 ? (
@@ -108,12 +109,12 @@ export default function PlaceActions({ placeId, placeName, imageUrl, category }:
             {relatedItems.map((item) => (
               <Link 
                 key={item._id} 
-                href={`/places/${item._id}`} // 
+                href={`/exploreDetailes/${item._id}`} // FIXED: Matches your dynamic details route structure
                 className="group block border rounded-xl p-3 bg-white shadow-sm hover:shadow-md transition"
               >
                 <div className="aspect-video w-full bg-gray-100 rounded-lg overflow-hidden mb-2">
                   <img 
-                    src={item.imageUrl || "/placeholder.jpg"} 
+                    src={item.imageUrl || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800"} 
                     alt={item.placeName} 
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
                   />

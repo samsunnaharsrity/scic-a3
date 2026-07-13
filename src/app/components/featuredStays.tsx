@@ -107,12 +107,12 @@ useEffect(() => {
 
                 {/* Amenities Badges */}
                 <div className="mt-3 flex flex-wrap gap-1.5 min-h-[24px]">
-                  {stay.amenities.slice(0, 2).map((amenity, i) => (
+                  {stay.amenities?.slice(0, 2).map((amenity, i) => (
                     <span key={i} className="rounded-md bg-white border border-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-600">
                       {amenity}
                     </span>
                   ))}
-                  {stay.amenities.length > 2 && (
+                  {stay.amenities?.length > 2 && (
                     <span className="text-[10px] text-gray-400 self-center font-medium">
                       +{stay.amenities.length - 2} more
                     </span>

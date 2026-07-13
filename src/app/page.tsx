@@ -7,6 +7,7 @@ import CategoryGrid from "./components/explore/categoryGrid";
 import FeaturedStays from "./components/featuredStays";
 
 
+
 export default function Home() {
   return (
     <div>

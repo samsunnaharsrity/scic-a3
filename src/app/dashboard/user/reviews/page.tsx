@@ -25,37 +25,26 @@ const user = session?.user;
 const [reviews,setReviews]=useState<Review[]>([]);
 
 
-useEffect(()=>{
+useEffect(() => {
+  if (!user?.email) return;
 
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/user/${user.email}`
+      );
+      const data = await res.json();
 
-if(!user?.email) return;
+      if (data.success) {
+        setReviews(data.reviews);
+      }
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
 
-
-const fetchReviews = async()=>{
-
-const res = await fetch(
-`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/user/${user.email}`
-);
-
-
-const data = await res.json();
-
-
-if(data.success){
-
-setReviews(data.reviews);
-
-}
-
-
-};
-
-
-fetchReviews();
-
-
-},[user]);
-
+  fetchReviews();
+}, [user?.email]); // এখানে user?.email দিন
 
 
 return (

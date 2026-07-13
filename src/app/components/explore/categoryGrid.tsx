@@ -110,7 +110,7 @@ export default function CategoryGrid({ limit }: CategoryGridProps) {
         
         {limit && categories.length > limit && (
           <Link
-            href="/components/explore" 
+            href="/category" 
             className="group inline-flex items-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition"
           >
             See All Categories
@@ -144,7 +144,7 @@ export default function CategoryGrid({ limit }: CategoryGridProps) {
                 </div>
 
                 <Link
-                  href={`/explore?category=${encodeURIComponent(item.category)}`}
+                  href={`/components/explore?category=${encodeURIComponent(item.category)}`}
                   className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-gray-800"
                 >
                   Explore Places

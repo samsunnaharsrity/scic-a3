@@ -122,7 +122,7 @@ export default async function DetailsPage({ params }: Props) {
       {/* Main Content Layout */}
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
         
-        {/* Left Side: Descriptions & Details */}
+        {/* Left Side */}
         <div className="space-y-10 lg:col-span-2">
           
           {/* Description */}
@@ -196,6 +196,7 @@ export default async function DetailsPage({ params }: Props) {
     placeName={place.title}
     image={place.image || ""}
     price={place.price}
+    location={place.location}
   />
           </div>
         </div>
