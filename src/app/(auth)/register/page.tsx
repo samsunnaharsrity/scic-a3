@@ -106,24 +106,38 @@ const handleSubmit = async (
       }
 
 
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    name,
-    email,
-    role,
-    plan: role === "admin" ? "admin" : "user_free",
-  }),
-});
+const userRes = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      email,
+      role,
+      plan: role === "admin" ? "admin" : "user_free",
+    }),
+  }
+);
+
+
+const userData = await userRes.json();
+
+
+if (!userRes.ok) {
+  console.log("User API Error:", userData);
+  throw new Error(
+    userData.message || "Failed to save user"
+  );
+}
+
 
 toast.success("Account created successfully!");
+
 router.push("/");
 
-      toast.success("Account created successfully!");
-      router.push("/");
     } catch (error: any) {
       console.error("Full Registration Error:", error);
 
