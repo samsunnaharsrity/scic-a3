@@ -12,11 +12,10 @@ type Role = "user" | "admin";
 type Strength = "weak" | "medium" | "strong" | "";
 
 const RegisterPage = () => {
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   const router = useRouter();
-
-  const roleFromURL =
-    (searchParams.get("role") as Role | null) ?? "user";
+  // const roleFromURL =
+  //   (searchParams.get("role") as Role | null) ?? "user";
 
   const [role, setRole] = useState<Role>("user");
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -32,11 +31,11 @@ const RegisterPage = () => {
   const [loading, setLoading] =
     useState<boolean>(false);
 
-  useEffect(() => {
-    if (roleFromURL === "admin" || roleFromURL === "user") {
-      setRole(roleFromURL);
-    }
-  }, [roleFromURL]);
+  // useEffect(() => {
+  //   if (roleFromURL === "admin" || roleFromURL === "user") {
+  //     setRole(roleFromURL);
+  //   }
+  // }, [roleFromURL]);
 
   const checkStrength = (value: string): Strength => {
     let score = 0;
