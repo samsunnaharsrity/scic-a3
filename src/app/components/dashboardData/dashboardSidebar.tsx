@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import app from "../../../../server/src/app";
+import { signOut } from "@/lib/auth-client";
 
 interface UserProps {
   role?: "admin" | "user" | string;
@@ -89,15 +90,21 @@ const [appName, setAppName] = useState("StayNest");
 
   const menus = role === "admin" ? adminMenu : userMenu;
 
-  const handleLogout = async () => {
+const handleLogout = async () => {
     startLogoutTransition(async () => {
       try {
         if (onLogout) {
+
           await onLogout();
         } else {
-          await fetch("/api/auth/logout", { method: "POST" });
-          router.push("/login");
-          router.refresh();
+          await signOut({
+            fetchOptions: {
+              onSuccess: () => {
+                router.push("/login");
+                router.refresh();
+              },
+            },
+          });
         }
       } catch (error) {
         console.error("Logout failed:", error);
@@ -245,15 +252,15 @@ const [appName, setAppName] = useState("StayNest");
 
         {/* Logout Section */}
         <div className="border-t px-4 border-slate-100 dark:border-neutral-900 shrink-0 bg-white dark:bg-neutral-950">
-          <button
-            type="button"
-            disabled={isLoggingOut}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-600 dark:text-red-400 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-950/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleLogout}
-          >
-            <LogOut size={18} className={isLoggingOut ? "animate-spin" : ""} />
-            <span>{isLoggingOut ? "Signing Out..." : "Logout"}</span>
-          </button>
+<button
+  type="button"
+  disabled={isLoggingOut}
+  className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-600 dark:text-red-400 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-950/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+  onClick={handleLogout}
+>
+  <LogOut size={18} className={isLoggingOut ? "animate-spin" : ""} />
+  <span>{isLoggingOut ? "Signing Out..." : "Logout"}</span>
+</button>
         </div>
 
         {/* Footer */}
