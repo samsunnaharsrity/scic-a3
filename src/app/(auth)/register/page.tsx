@@ -1,8 +1,12 @@
 "use client";
 
 import { authClient, signUp } from "@/lib/auth-client";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState, FormEvent, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+
+import {
+  useState,
+  FormEvent,
+} from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Palette, ShoppingBag } from "lucide-react";
