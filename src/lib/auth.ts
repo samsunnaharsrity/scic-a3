@@ -7,6 +7,12 @@ const client = new MongoClient(process.env.MONGODB_URI || "mongodb://localhost:2
 const db = client.db(process.env.AUTH_DB_NAME || "database");
 
 export const auth = betterAuth({
+
+    trustedOrigins: [
+    "http://localhost:3000",
+    "https://scic-a3.vercel.app",
+  ],
+
   emailAndPassword: {
     enabled: true,
   },

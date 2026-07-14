@@ -106,7 +106,7 @@ const handleSubmit = async (
       }
 
 
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
