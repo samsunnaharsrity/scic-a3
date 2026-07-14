@@ -22,6 +22,10 @@ interface Category {
   total: number;
 }
 
+interface Place {
+  category?: string;
+}
+
 const iconMap: Record<string, any> = {
   Beaches: Waves,
   Beach: Waves,
@@ -80,27 +84,28 @@ export default function CategoryPage() {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/explore`
         );
-        const data = await res.json();
-        const places = data.data || data;
+const data = await res.json();
 
-        const grouped = places.reduce(
-          (acc: Record<string, number>, item: any) => {
-            if (item.category) {
-              acc[item.category] = (acc[item.category] || 0) + 1;
-            }
-            return acc;
-          },
-          {}
-        );
+const places: Place[] = data.data || data;
 
-        const formatted = Object.entries(grouped).map(
-          ([category, total]) => ({
-            category,
-            total,
-          })
-        );
+const grouped = places.reduce<Record<string, number>>(
+  (acc, item) => {
+    if (item.category) {
+      acc[item.category] = (acc[item.category] || 0) + 1;
+    }
+    return acc;
+  },
+  {}
+);
 
-        setCategories(formatted);
+const formatted: Category[] = Object.entries(grouped).map(
+  ([category, total]) => ({
+    category,
+    total: Number(total),
+  })
+);
+
+setCategories(formatted);
       } catch (error) {
         console.error("Error fetching categories:", error);
       } finally {
