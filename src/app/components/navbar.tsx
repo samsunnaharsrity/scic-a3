@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Menu,
   X,
@@ -20,6 +20,32 @@ const Navbar = () => {
   const { data: session } = useSession();
 
   const isLoggedIn = !!session;
+
+const [siteName, setSiteName] = useState("StayNest");
+
+useEffect(() => {
+  const loadSettings = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/settings`);
+    const data = await res.json();
+
+    if (res.ok) {
+      setSiteName(data.siteName);
+    }
+  };
+
+  loadSettings();
+
+  const handleSettingsUpdate = () => {
+    loadSettings();
+  };
+
+  window.addEventListener("settingsUpdated", handleSettingsUpdate);
+
+  return () => {
+    window.removeEventListener("settingsUpdated", handleSettingsUpdate);
+  };
+}, []);
+
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -56,7 +82,7 @@ const Navbar = () => {
           className="flex items-center gap-2 text-2xl font-bold text-[#16352E]"
         >
           <Home size={28} />
-          <span>StayNest</span>
+          <span>{siteName}</span>
         </Link>
 
         {/* Desktop Navigation */}

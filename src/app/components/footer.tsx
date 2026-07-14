@@ -11,24 +11,25 @@ import {
 } from "lucide-react";
 import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 import {  FaLinkedin } from "react-icons/fa6";
+import { useEffect, useState } from "react";
 
 const Footer = () => {
   const quickLinks = [
     { name: "Home", href: "/" },
-    { name: "Explore", href: "/explore" },
-    { name: "Categories", href: "/categories" },
+    { name: "Explore", href: "/components/explore" },
+    { name: "Categories", href: "/category" },
     { name: "About", href: "/about" },
     { name: "Blog", href: "/blog" },
     { name: "Contact", href: "/contact" },
   ];
 
-  const supportLinks = [
-    { name: "Help Center", href: "#" },
-    { name: "Privacy Policy", href: "#" },
-    { name: "Terms & Conditions", href: "#" },
-    { name: "Cancellation Policy", href: "#" },
-    { name: "FAQs", href: "#" },
-  ];
+const supportLinks = [
+  { name: "Help Center", href: "/help-center" },
+  { name: "Privacy Policy", href: "/privacy-policy" },
+  { name: "Terms & Conditions", href: "/terms" },
+  { name: "Cancellation Policy", href: "/cancellation-policy" },
+  { name: "FAQs", href: "/FAQs" },
+];
 
 const socials = [
   {
@@ -48,6 +49,53 @@ const socials = [
     href: "https://linkedin.com",
   },
 ];
+
+
+const [settings, setSettings] = useState({
+  siteName: "StayNest",
+  email: "support@staynest.com",
+  phone: "+880 1700-000000",
+  address: "Dhaka, Bangladesh",
+});
+
+useEffect(() => {
+  const loadSettings = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/settings`,
+        {
+          cache: "no-store",
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSettings({
+          siteName: data.siteName || "StayNest",
+          email: data.email || "support@staynest.com",
+          phone: data.phone || "+880 1700-000000",
+          address: data.address || "Dhaka, Bangladesh",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  loadSettings();
+
+  const handleSettingsUpdate = () => {
+    loadSettings();
+  };
+
+  window.addEventListener("settingsUpdated", handleSettingsUpdate);
+
+  return () => {
+    window.removeEventListener("settingsUpdated", handleSettingsUpdate);
+  };
+}, []);
+
 
   return (
     <footer className="relative overflow-hidden bg-[#16352E] text-white">
@@ -73,7 +121,7 @@ const socials = [
               className="flex items-center gap-2 text-3xl font-black"
             >
               <Home size={30} />
-              StayNest
+              {settings.siteName}
             </Link>
 
             <p className="mt-6 leading-8 text-gray-300">
@@ -166,7 +214,7 @@ const socials = [
                 />
 
                 <p className="text-gray-300">
-                  Dhaka, Bangladesh
+                  {settings.address}
                 </p>
 
               </div>
@@ -179,7 +227,7 @@ const socials = [
                 />
 
                 <p className="text-gray-300">
-                  +880 1700-000000
+                  {settings.phone}
                 </p>
 
               </div>
@@ -192,7 +240,7 @@ const socials = [
                 />
 
                 <p className="text-gray-300">
-                  support@staynest.com
+                  {settings.email}
                 </p>
 
               </div>
