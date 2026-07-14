@@ -90,10 +90,10 @@ const handleSubmit = async (
         email,
         password: passwordValue,
         callbackURL: "/", 
-        data: {
-          role,
-          plan,
-        }
+        // data: {
+        //   role,
+        //   plan,
+        // }
       });
 
 
@@ -101,6 +101,23 @@ const handleSubmit = async (
         toast.error(result.error.message || "Signup failed");
         return;
       }
+
+
+      await fetch("http://localhost:7000/api/users", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    name,
+    email,
+    role,
+    plan: role === "admin" ? "admin" : "user_free",
+  }),
+});
+
+toast.success("Account created successfully!");
+router.push("/");
 
       toast.success("Account created successfully!");
       router.push("/");

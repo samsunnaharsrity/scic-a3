@@ -42,8 +42,12 @@ export default function ExploreCard({
 
       <div className="relative h-52 overflow-hidden">
         <Image
-          src={place.image}
-          alt={place.title}
+          src={
+            place.image?.trim()
+              ? place.image
+              : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&auto=format&fit=crop&q=80"
+          }
+          alt={place.title || "Stay Image"}
           fill
           className="object-cover transition duration-500 group-hover:scale-110"
         />

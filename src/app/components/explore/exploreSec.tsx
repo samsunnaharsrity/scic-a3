@@ -199,6 +199,19 @@ export default function ExploreSection({ limit }: ExploreSectionProps) {
             setCurrentPage={setCurrentPage}
           />
         )}
+
+        {/* View More Button (Only Home Page) */}
+{limit && filteredPlaces.length > limit && (
+  <div className="mt-12 flex justify-center">
+    <Link
+      href="/components/explore"
+      className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 text-white font-semibold transition hover:bg-green-700"
+    >
+      View More
+      <ArrowRight size={18} />
+    </Link>
+  </div>
+)}
       </div>
     </section>
   );

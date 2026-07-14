@@ -48,7 +48,7 @@ const handleUpdate = async () => {
     const email = encodeURIComponent(user?.email || "");
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${email}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user/${email}`,
       {
         method: "PATCH",
         headers: {

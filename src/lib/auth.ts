@@ -7,17 +7,27 @@ const client = new MongoClient(process.env.MONGODB_URI || "mongodb://localhost:2
 const db = client.db(process.env.AUTH_DB_NAME || "database");
 
 export const auth = betterAuth({
-  emailAndPassword: { 
-    enabled: true, 
-  }, 
+  emailAndPassword: {
+    enabled: true,
+  },
 
   database: mongodbAdapter(db, {
-    client
+    client,
   }),
+
+  user: {
+    additionalFields: {
+      plan: {
+        type: "string",
+        required: false,
+        defaultValue: "free",
+      },
+    },
+  },
 
   plugins: [
     admin({
       defaultRole: "user",
-    })
+    }),
   ],
 });

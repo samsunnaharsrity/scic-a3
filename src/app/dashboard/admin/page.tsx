@@ -1,93 +1,76 @@
-import { 
-  Users, 
-  Hotel, 
-  CalendarDays, 
-  TrendingUp, 
-  DollarSign, 
-  Star 
-} from "lucide-react";
+"use client";
 
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  icon: any;
-  description: string;
-  change: string;
-  isPositive: boolean;
-}
+import { useEffect, useState } from "react";
+import { Users, Hotel, CalendarDays, DollarSign, Star, Loader2, TrendingUp, Activity } from "lucide-react";
 
 export default function AdminDashboard() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/dashboard`)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success) setData(res.data);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center">
+      <Loader2 className="animate-spin text-indigo-600" size={48} />
+    </div>
+  );
+
   return (
-    <div className="p-6 mt-15 space-y-8 bg-slate-50/50 dark:bg-neutral-900/10 min-h-screen">
+    <div className="p-8 mt-10 space-y-8 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-          Admin Control Center
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-neutral-400 mt-1">
-          Here is a quick overview of StayNest live operations and performance.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900">Admin Control Center</h1>
+          <p className="mt-2 max-w-xl text-sm text-gray-600">
+            Monitor bookings, users, properties, and platform performance from one centralized dashboard with real-time insights.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border shadow-sm text-sm font-semibold text-green-600">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            System Operational
+          </span>
+        </div>
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Earnings"
-          value="$24,560"
-          icon={DollarSign}
-          description="Compared to last month"
-          change="+12.5%"
-          isPositive={true}
-        />
-        <StatCard
-          title="Active Bookings"
-          value="142"
-          icon={CalendarDays}
-          description="Live checked-in stays"
-          change="+8.2%"
-          isPositive={true}
-        />
-        <StatCard
-          title="Total Registered Users"
-          value="1,248"
-          icon={Users}
-          description="New users this week"
-          change="+4.3%"
-          isPositive={true}
-        />
-        <StatCard
-          title="Active Stays / Hotels"
-          value="45"
-          icon={Hotel}
-          description="Properties listed"
-          change="-1.2%"
-          isPositive={false}
-        />
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard title="Total Earnings" value={`$${data.totalRevenue}`} icon={DollarSign} change="+12.5%" color="bg-orange-500" />
+        <StatCard title="Total Bookings" value={data.totalBookings} icon={CalendarDays} change="+8.2%" color="bg-blue-500" />
+        <StatCard title="Total Users" value={data.totalUsers} icon={Users} change="+4.3%" color="bg-purple-500" />
+        <StatCard title="Active Stays" value={data.totalStays} icon={Hotel} change="0%" color="bg-emerald-500" />
       </div>
 
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Recent Bookings Panel */}
-        <div className="rounded-2xl border border-slate-100 dark:border-neutral-900 bg-white dark:bg-neutral-950 p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">Recent Bookings</h2>
-            <span className="text-xs font-semibold text-green-700 bg-green-50 dark:bg-green-950/30 px-2 py-1 rounded-md">Live Update</span>
-          </div>
-          <div className="space-y-3">
-            {[
-              { id: "#1024", user: "Rahman Khan", stay: "Grand Luxury Suite", status: "Paid", amount: "$320" },
-              { id: "#1023", user: "Sadia Islam", stay: "Ocean View Studio", status: "Pending", amount: "$150" },
-              { id: "#1022", user: "Tanvir Ahmed", stay: "Cozy Mountain Cabin", status: "Paid", amount: "$450" },
-            ].map((booking, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/50 text-sm">
-                <div>
-                  <p className="font-semibold text-slate-800 dark:text-neutral-200">{booking.user}</p>
-                  <p className="text-xs text-slate-400 dark:text-neutral-500">{booking.stay}</p>
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Recent Bookings */}
+        <div className="lg:col-span-2 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 mb-6">Recent Bookings</h2>
+          <div className="space-y-4">
+            {data.recentBookings.map((b: any) => (
+              <div key={b._id} className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-700">
+                    {(b?.email?.charAt(0) || "U").toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{b?.placeName || "Unknown User"}</p>
+                    <p className="text-xs text-gray-500">{b?.location || "No location"}</p>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-slate-900 dark:text-white">{booking.amount}</p>
-                  <span className={`text-[10px] font-extrabold uppercase ${booking.status === 'Paid' ? 'text-green-600' : 'text-amber-500'}`}>
-                    {booking.status}
+                  <p className="font-bold text-gray-900">${b?.price || 0}</p>
+                  <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-green-100 text-green-700">
+                    {b?.status || "N/A"}
                   </span>
                 </div>
               </div>
@@ -95,24 +78,13 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Platform Overview Panel */}
-        <div className="rounded-2xl border border-slate-100 dark:border-neutral-900 bg-white dark:bg-neutral-950 p-6 shadow-sm">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4">Platform Health & Reviews</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-50 dark:border-neutral-900 pb-3">
-              <span className="text-sm text-slate-500 dark:text-neutral-400">Average Rating</span>
-              <div className="flex items-center gap-1 text-amber-500 font-bold text-sm">
-                <Star size={16} fill="currentColor" /> 4.8 / 5.0
-              </div>
-            </div>
-            <div className="flex justify-between items-center border-b border-slate-50 dark:border-neutral-900 pb-3">
-              <span className="text-sm text-slate-500 dark:text-neutral-400">Server Status</span>
-              <span className="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-950/30 px-2 py-0.5 rounded-full">Operational</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-500 dark:text-neutral-400">API Latency</span>
-              <span className="text-xs font-mono text-slate-600 dark:text-neutral-400">124ms</span>
-            </div>
+        {/* Platform Health */}
+        <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 mb-6">Platform Health</h2>
+          <div className="space-y-6">
+            <HealthItem label="Average Rating" value={data.averageRating} icon={Star} color="text-amber-500" />
+            <HealthItem label="API Latency" value={data.apiLatency} icon={Activity} color="text-indigo-500" />
+            <HealthItem label="Monthly Growth" value="+24%" icon={TrendingUp} color="text-green-500" />
           </div>
         </div>
       </div>
@@ -120,30 +92,29 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ title, value, icon: Icon, description, change, isPositive }: StatCardProps) {
+function StatCard({ title, value, icon: Icon, change, color }: any) {
   return (
-    <div className="rounded-2xl border border-slate-100 dark:border-neutral-900 bg-white dark:bg-neutral-950 p-6 shadow-sm transition-all hover:shadow-md">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-neutral-500">
-          {title}
-        </span>
-        <div className="rounded-xl bg-slate-50 dark:bg-neutral-900 p-2.5 text-slate-600 dark:text-neutral-400">
-          <Icon size={20} />
-        </div>
+    <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div className={`w-12 h-12 rounded-2xl ${color} flex items-center justify-center text-white mb-4`}>
+        <Icon size={24} />
       </div>
-      <div className="mt-4">
-        <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-          {value}
-        </h3>
-        <div className="mt-1 flex items-center gap-1.5 text-xs">
-          <span className={`font-bold ${isPositive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-            {change}
-          </span>
-          <span className="text-slate-400 dark:text-neutral-500">
-            {description}
-          </span>
-        </div>
+      <p className="text-sm text-gray-500 font-medium">{title}</p>
+      <div className="flex items-end justify-between mt-1">
+        <h3 className="text-2xl font-black text-gray-900">{value}</h3>
+        <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">{change}</span>
       </div>
+    </div>
+  );
+}
+
+function HealthItem({ label, value, icon: Icon, color }: any) {
+  return (
+    <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50">
+      <div className="flex items-center gap-3">
+        <Icon size={20} className={color} />
+        <span className="text-sm font-medium text-gray-600">{label}</span>
+      </div>
+      <span className="font-bold text-gray-900">{value}</span>
     </div>
   );
 }

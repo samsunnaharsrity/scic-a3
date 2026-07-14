@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -20,6 +20,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import app from "../../../../server/src/app";
 
 interface UserProps {
   role?: "admin" | "user" | string;
@@ -61,7 +62,7 @@ const userMenu: MenuItem[] = [
 ];
 
 export default function DashboardSidebar({ user, session, onLogout }: DashboardSidebarProps) {
-
+const [appName, setAppName] = useState("StayNest");
 
   const pathname = usePathname();
   const router = useRouter();
@@ -106,6 +107,27 @@ export default function DashboardSidebar({ user, session, onLogout }: DashboardS
     });
   };
 
+
+  useEffect(() => {
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/settings`
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        setAppName(data.data.siteName || "StayNest");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchSettings();
+}, []);
+
   return (
     <>
       {/* Mobile Toggle Button */}
@@ -139,7 +161,7 @@ export default function DashboardSidebar({ user, session, onLogout }: DashboardS
         <div className="flex items-center justify-between border-b p-3 border-slate-100 dark:border-neutral-900 shrink-0">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-green-950 dark:text-green-400">
-              StayNest
+              {appName}
             </h1>
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-neutral-500">
               {role} workspace
@@ -222,7 +244,7 @@ export default function DashboardSidebar({ user, session, onLogout }: DashboardS
         </div>
 
         {/* Logout Section */}
-        <div className="border-t p-4 border-slate-100 dark:border-neutral-900 shrink-0 bg-white dark:bg-neutral-950">
+        <div className="border-t px-4 border-slate-100 dark:border-neutral-900 shrink-0 bg-white dark:bg-neutral-950">
           <button
             type="button"
             disabled={isLoggingOut}
@@ -235,7 +257,7 @@ export default function DashboardSidebar({ user, session, onLogout }: DashboardS
         </div>
 
         {/* Footer */}
-        <div className="border-t px-6 py-4 text-center border-slate-100 dark:border-neutral-900 bg-slate-50/30 dark:bg-neutral-900/10 shrink-0">
+        <div className="border-t px-6 py-2 text-center border-slate-100 dark:border-neutral-900 bg-slate-50/30 dark:bg-neutral-900/10 shrink-0">
           <p className="text-[11px] font-medium text-slate-400 dark:text-neutral-500">
             © {new Date().getFullYear()} StayNest LLC.
           </p>

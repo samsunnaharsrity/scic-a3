@@ -11,6 +11,7 @@ interface Stay {
   type: string;
   status: "Available" | "Booked" | string;
   image?: string;
+  description: string;
 }
 
 export default function ManageStaysPage() {
@@ -19,6 +20,27 @@ export default function ManageStaysPage() {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+
+  // IMAGE UPLOAD
+  const uploadImage = async (file: File) => {
+  const formData = new FormData();
+
+  formData.append("image", file);
+
+  const res = await fetch(
+    `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  const data = await res.json();
+
+  return data.data.url;
+};
 
   // Modal & Edit State
   const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +54,7 @@ export default function ManageStaysPage() {
     price: "",
     type: "Hotel",
     image: "",
+    description: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,7 +67,7 @@ export default function ManageStaysPage() {
         setLoading(true);
         setApiError(null);
         
-        const response = await fetch(`${baseUrl}/api/stays`, {
+        const response = await fetch(`${baseUrl}/api/explore`, {
           method: "GET",
           headers: { "Content-Type": "application/json" }
         });
@@ -58,8 +81,9 @@ export default function ManageStaysPage() {
         if (result.success && Array.isArray(result.data)) {
           const formattedData = result.data.map((s: any) => ({
             id: s._id || s.id,
-            title: s.title || "Untitled Stay",
-            location: s.location || "Unknown Location",
+            title: s.title,
+            location: s.location,
+            description: s.description || "",
             price: Number(s.price) || 0,
             type: s.type || "Hotel",
             status: s.available !== false ? "Available" : "Booked",
@@ -84,7 +108,8 @@ export default function ManageStaysPage() {
   const handleOpenAddModal = () => {
     setIsEditMode(false);
     setSelectedStayId(null);
-    setFormData({ title: "", location: "", price: "", type: "Hotel", image: "" });
+    setFormData({ title: "", location: "", price: "", type: "Hotel", image: "" ,description: "",
+});
     setIsOpen(true);
   };
 
@@ -98,6 +123,7 @@ export default function ManageStaysPage() {
       price: stay.price.toString(),
       type: stay.type,
       image: stay.image || "",
+      description: stay.description,
     });
     setIsOpen(true);
   };
@@ -107,9 +133,15 @@ export default function ManageStaysPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const url = isEditMode 
-      ? `${baseUrl}/api/admin/stays/${selectedStayId}`
-      : `${baseUrl}/api/admin/stays`;
+  let imageUrl = "";
+
+  if (imageFile) {
+    imageUrl = await uploadImage(imageFile);
+  }
+
+   const url = isEditMode
+  ? `${baseUrl}/api/stays/${selectedStayId}`
+  : `${baseUrl}/api/stays`;
     
     const method = isEditMode ? "PUT" : "POST";
 
@@ -120,9 +152,11 @@ export default function ManageStaysPage() {
         body: JSON.stringify({
           title: formData.title,
           location: formData.location,
+          description: formData.description,
           price: Number(formData.price),
           type: formData.type,
-          image: formData.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+          image: imageUrl ||
+          formData.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945",
           available: true,
         }),
       });
@@ -133,6 +167,7 @@ export default function ManageStaysPage() {
           id: resData._id || resData.id,
           title: resData.title,
           location: resData.location,
+          description: resData.description || formData.description,
           price: resData.price,
           type: resData.type,
           status: resData.available !== false ? "Available" : "Booked",
@@ -164,7 +199,7 @@ export default function ManageStaysPage() {
 
     startTransition(async () => {
       try {
-        const response = await fetch(`${baseUrl}/api/admin/stays/${stayId}`, {
+        const response = await fetch(`${baseUrl}/api/stays/${stayId}`, {
           method: "DELETE",
         });
 
@@ -297,11 +332,11 @@ export default function ManageStaysPage() {
       {/* ADD / EDIT STAY MODAL */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-neutral-900">
-            <div className="flex items-center justify-between border-b pb-4">
-              <h2 className="text-xl font-bold">{isEditMode ? "Edit Stay details" : "Add New Stay"}</h2>
-              <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700"><X size={20} /></button>
-            </div>
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-neutral-900">
+            <div className="flex items-center justify-between border-b pb-4 sticky top-0 bg-white dark:bg-neutral-900 z-10">
+            <h2 className="text-xl font-bold">{isEditMode ? "Edit Stay details" : "Add New Stay"}</h2>
+            <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700"><X size={20} /></button>
+          </div>
 
             <form onSubmit={handleFormSubmit} className="mt-4 space-y-4">
               <div>
@@ -312,6 +347,17 @@ export default function ManageStaysPage() {
                 <label className="block text-sm font-medium">Location</label>
                 <input type="text" required value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="mt-1 w-full rounded-xl border p-3 text-sm" />
               </div>
+
+              <div>
+  <label className="block text-sm font-medium">Description</label>
+  <textarea 
+    required 
+    value={formData.description} 
+    onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+    className="mt-1 w-full rounded-xl border p-3 text-sm h-24"
+    placeholder="Enter property description..."
+  />
+</div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">Price per Night ($)</label>
@@ -328,9 +374,18 @@ export default function ManageStaysPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium">Image URL</label>
-                <input type="url" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} className="mt-1 w-full rounded-xl border p-3 text-sm" />
-              </div>
+  <label className="block text-sm font-medium">Image URL</label>
+
+  <input
+    type="url"
+    placeholder="https://i.ibb.co/xxxx/image.jpg"
+    value={formData.image}
+    onChange={(e) =>
+      setFormData({ ...formData, image: e.target.value })
+    }
+    className="mt-1 w-full rounded-xl border p-3 text-sm"
+  />
+</div>
 
               <div className="flex justify-end gap-3 border-t pt-4 mt-6">
                 <button type="button" onClick={() => setIsOpen(false)} className="rounded-xl border px-4 py-2.5 text-sm">Cancel</button>
@@ -346,7 +401,7 @@ export default function ManageStaysPage() {
       {/* VIEW DETAILS MODAL */}
       {viewStay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-neutral-900">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-neutral-900">
             <div className="flex items-center justify-between border-b pb-4">
               <h2 className="text-xl font-bold">Stay Information</h2>
               <button onClick={() => setViewStay(null)} className="text-gray-500"><X size={20} /></button>
@@ -360,6 +415,11 @@ export default function ManageStaysPage() {
                 <span className="text-gray-500">Location:</span>
                 <span className="font-medium">{viewStay.location}</span>
               </div>
+
+<div className="py-2 border-b">
+  <span className="text-gray-500 block text-sm">Description:</span>
+  <p className="text-sm mt-1 text-gray-700 dark:text-gray-300">{viewStay.description}</p>
+</div>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-500">Type:</span>
                 <span className="font-medium">{viewStay.type}</span>

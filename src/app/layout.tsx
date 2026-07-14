@@ -33,7 +33,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ToastContainer
-          position="top-right"
+          position="top-center"
           autoClose={3000}
           hideProgressBar={false}
           newestOnTop
