@@ -23,8 +23,8 @@ export default function Home() {
         <ExploreSection limit={4} />
       </Suspense>
       {/* <FeaturedStays /> */}
-      <Testimonials />
       <TravelBlogs />
+      <Testimonials />
       {/* <Newsletter /> */}
       <Footer></Footer>
     </div>
