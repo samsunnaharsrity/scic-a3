@@ -6,6 +6,7 @@ import { ArrowRight, ArrowUpRight, Calendar } from "lucide-react";
 
 const HOME_BLOGS = [
   {
+    slug: "best-places-to-travel-2026",
     image: "/des.jfif",
     category: "Destination",
     title: "Best Places To Travel In 2026",
@@ -13,6 +14,7 @@ const HOME_BLOGS = [
     date: "June 25, 2026",
   },
   {
+    slug: "how-to-choose-perfect-hotel",
     image: "/guide.jfif",
     category: "Hotel Guide",
     title: "How To Choose The Perfect Hotel",
@@ -20,6 +22,7 @@ const HOME_BLOGS = [
     date: "June 18, 2026",
   },
   {
+    slug: "luxury-travel-on-a-budget",
     image: "/blog1.jfif",
     category: "Luxury Travel",
     title: "Luxury Travel On A Budget",
@@ -88,7 +91,7 @@ export default function TravelBlogs() {
                 
                 {/* Minimal Read Link */}
                 <Link
-                  href="#"
+                  href={`/blog/${blog.slug}`}
                   className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-gray-50 group-hover:bg-[#16352E] px-4 py-3 text-xs font-bold text-[#16352E] group-hover:text-white transition-all duration-300"
                 >
                   Read Article
