@@ -38,7 +38,7 @@ const BLOGS: BlogItem[] = [
     slug: "luxury-travel-on-a-budget",
   },
   {
-    image: "/adventure.jpg",
+    image: "/stay.jpg",
     category: "Adventure",
     title: "Top Mountain Retreats",
     desc: "Discover peaceful mountain locations perfect for your next vacation.",

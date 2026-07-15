@@ -7,7 +7,7 @@ import { ArrowRight, ArrowUpRight, Calendar } from "lucide-react";
 const HOME_BLOGS = [
   {
     slug: "best-places-to-travel-2026",
-    image: "/des.jfif",
+    image: "/des.jpg",
     category: "Destination",
     title: "Best Places To Travel In 2026",
     desc: "Explore trending destinations, hidden gems and unforgettable travel experiences.",
@@ -15,7 +15,7 @@ const HOME_BLOGS = [
   },
   {
     slug: "how-to-choose-perfect-hotel",
-    image: "/guide.jfif",
+    image: "/guide.jpg",
     category: "Hotel Guide",
     title: "How To Choose The Perfect Hotel",
     desc: "Learn smart booking tips to find comfortable and luxury stays.",
@@ -23,7 +23,7 @@ const HOME_BLOGS = [
   },
   {
     slug: "luxury-travel-on-a-budget",
-    image: "/blog1.jfif",
+    image: "/blog1.jpg",
     category: "Luxury Travel",
     title: "Luxury Travel On A Budget",
     desc: "Enjoy premium experiences without spending more than necessary.",
