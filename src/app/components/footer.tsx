@@ -296,7 +296,7 @@ useEffect(() => {
         <div className="mt-16 flex flex-col items-center justify-between gap-5 border-t border-white/10 pt-8 text-center text-sm text-gray-400 md:flex-row">
 
           <p>
-            © {new Date().getFullYear()} StayNest.
+            © {new Date().getFullYear()} {settings.siteName}.
             All Rights Reserved.
           </p>
 

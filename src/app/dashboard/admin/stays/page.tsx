@@ -9,9 +9,11 @@ interface Stay {
   location: string;
   price: number;
   type: string;
-  status: "Available" | "Booked" | string;
-  image?: string;
   description: string;
+  image?: string;
+  badge?: string;
+  date?: string;
+  status: "Available" | "Booked" | string;
 }
 
 export default function ManageStaysPage() {
@@ -55,6 +57,8 @@ export default function ManageStaysPage() {
     type: "Hotel",
     image: "",
     description: "",
+    badge: "Popular",
+    date: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -86,6 +90,8 @@ export default function ManageStaysPage() {
             description: s.description || "",
             price: Number(s.price) || 0,
             type: s.type || "Hotel",
+            badge: s.badge,
+            date: s.date,
             status: s.available !== false ? "Available" : "Booked",
             image: s.image || "",
           }));
@@ -108,7 +114,8 @@ export default function ManageStaysPage() {
   const handleOpenAddModal = () => {
     setIsEditMode(false);
     setSelectedStayId(null);
-    setFormData({ title: "", location: "", price: "", type: "Hotel", image: "" ,description: "",
+    setFormData({ title: "", location: "", price: "", type: "Hotel", image: "" ,description: "",  badge: "Popular",
+  date: "",
 });
     setIsOpen(true);
   };
@@ -124,6 +131,8 @@ export default function ManageStaysPage() {
       type: stay.type,
       image: stay.image || "",
       description: stay.description,
+      badge: "Popular",
+      date: "",
     });
     setIsOpen(true);
   };
@@ -157,6 +166,8 @@ export default function ManageStaysPage() {
           type: formData.type,
           image: imageUrl ||
           formData.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+          badge: formData.badge,
+          date: formData.date,
           available: true,
         }),
       });
@@ -373,7 +384,42 @@ export default function ManageStaysPage() {
                   </select>
                 </div>
               </div>
-              <div>
+
+<div>
+  <label className="block text-sm font-medium">Badge</label>
+
+  <select
+    value={formData.badge}
+    onChange={(e) =>
+      setFormData({ ...formData, badge: e.target.value })
+    }
+    className="mt-1 w-full rounded-xl border p-3 text-sm"
+  >
+    <option value="Popular">Popular</option>
+    <option value="New">New</option>
+    <option value="Trending">Trending</option>
+    <option value="Featured">Featured</option>
+  </select>
+</div>
+
+<div>
+  <label className="block text-sm font-medium">
+    Available Date
+  </label>
+
+  <input
+    type="date"
+    value={formData.date}
+    onChange={(e) =>
+      setFormData({ ...formData, date: e.target.value })
+    }
+    className="mt-1 w-full rounded-xl border p-3 text-sm"
+  />
+</div>
+
+
+
+<div>
   <label className="block text-sm font-medium">Image URL</label>
 
   <input
