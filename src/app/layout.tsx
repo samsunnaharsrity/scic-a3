@@ -5,7 +5,6 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import { ToastContainer } from "react-toastify";
 import { Toaster } from "react-hot-toast";
-import { UserProvider } from "./components/userProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,14 +42,10 @@ export default function RootLayout({
           draggable
           theme="light"
         />
-        <UserProvider initialUser={null}>
-
         <Navbar></Navbar>
         <Toaster position="top-center" reverseOrder={false} />
         {children}
         <Footer></Footer>
-        </UserProvider>
-
       </body>
     </html>
   );

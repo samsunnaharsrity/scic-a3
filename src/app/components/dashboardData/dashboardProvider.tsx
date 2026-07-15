@@ -1,44 +1,18 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext } from "react";
 
 const DashboardContext = createContext<any>(null);
 
 export function DashboardProvider({
   children,
-  session: initialSession,
+  session,
 }: {
   children: React.ReactNode;
   session: any;
 }) {
-  const [session, setSession] = useState(initialSession);
-
-const refreshSession = async () => {
-  if (!session?.user?.email) return;
-
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/user/${encodeURIComponent(session.user.email)}`
-  );
-
-  const data = await res.json();
-
-  if (data.success) {
-    setSession((prev: any) => ({
-      ...prev,
-      user: {
-        ...prev.user,
-        ...data.data,
-      },
-    }));
-  }
-};
   return (
-    <DashboardContext.Provider
-      value={{
-        session,
-        refreshSession,
-      }}
-    >
+    <DashboardContext.Provider value={session}>
       {children}
     </DashboardContext.Provider>
   );
