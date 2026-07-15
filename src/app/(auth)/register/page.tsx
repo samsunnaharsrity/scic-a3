@@ -107,7 +107,7 @@ const handleSubmit = async (
 
 
 const userRes = await fetch(
-  `${process.env.BETTER_AUTH_URL}/api/user`,
+  `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
   {
     method: "POST",
     headers: {
