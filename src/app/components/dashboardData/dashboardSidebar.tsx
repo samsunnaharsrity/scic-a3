@@ -128,7 +128,7 @@ useEffect(() => {
       const data = await res.json();
 
       if (res.ok) {
-        setAppName(data.siteName || data.data?.siteName || "StayNest");
+        setAppName(data.data?.siteName || data.siteName || "StayNest");
       }
     } catch (err) {
       console.error(err);
@@ -147,6 +147,10 @@ useEffect(() => {
     window.removeEventListener("settingsUpdated", handleSettingsUpdate);
   };
 }, []);
+
+
+
+
 
   return (
     <>
