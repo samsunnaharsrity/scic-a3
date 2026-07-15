@@ -44,7 +44,7 @@ useEffect(() => {
   };
 
   fetchReviews();
-}, [user?.email]); // এখানে user?.email দিন
+}, [user?.email]);
 
 
 return (

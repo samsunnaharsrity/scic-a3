@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Save } from "lucide-react";
 
 export default function ProfilePage() {
-  const session = useDashboard();
+  const { session, refreshSession } = useDashboard();
 
   const user = session?.user;
 
@@ -66,6 +66,7 @@ const handleUpdate = async () => {
 
     if (data.success) {
       alert("Profile updated successfully");
+      await refreshSession();
     }
 
   } catch (error) {

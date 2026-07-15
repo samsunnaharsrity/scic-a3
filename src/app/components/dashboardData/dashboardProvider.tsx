@@ -1,18 +1,30 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const DashboardContext = createContext<any>(null);
 
 export function DashboardProvider({
   children,
-  session,
+  session: initialSession,
 }: {
   children: React.ReactNode;
   session: any;
 }) {
+  const [session, setSession] = useState(initialSession);
+
+  const refreshSession = async () => {
+    try {
+      const res = await fetch("/api/auth/get-session");
+      const data = await res.json();
+      setSession(data);
+    } catch (error) {
+      console.error("Failed to refresh session:", error);
+    }
+  };
+
   return (
-    <DashboardContext.Provider value={session}>
+    <DashboardContext.Provider value={{ session, refreshSession }}>
       {children}
     </DashboardContext.Provider>
   );
