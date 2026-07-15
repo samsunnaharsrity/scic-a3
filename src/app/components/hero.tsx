@@ -114,7 +114,7 @@ export default function Hero() {
           <div className="relative lg:ml-4">
             <div className="overflow-hidden rounded-2xl border border-white/10 shadow-2xl aspect-[4/5] max-h-[580px]">
               <Image
-                src="/hero1.jfif"
+                src="/hero1.jpg"
                 alt="Luxury Stay"
                 width={800}
                 height={1000}
