@@ -7,6 +7,7 @@ import CategoryGrid from "./components/explore/categoryGrid";
 import FeaturedStays from "./components/featuredStays";
 import TravelBlogs from "./components/travelBlogs";
 import { Suspense } from "react";
+import Footer from "./components/footer";
 
 
 
@@ -24,6 +25,7 @@ export default function Home() {
       {/* <Testimonials /> */}
       <TravelBlogs />
       {/* <Newsletter /> */}
+      <Footer></Footer>
     </div>
   );
 }
