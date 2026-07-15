@@ -88,28 +88,36 @@ useEffect(() => {
     let filtered = [...places];
 
     // Search
-    if (search) {
-      filtered = filtered.filter(
-        (place) =>
-          place.title.toLowerCase().includes(search.toLowerCase()) ||
-          place.location.toLowerCase().includes(search.toLowerCase()) ||
-          place.category.toLowerCase().includes(search.toLowerCase())
-      );
-    }
+if (search.trim()) {
+  const keyword = search.toLowerCase().trim();
+
+  filtered = filtered.filter((place) => {
+    const title = place.title?.toLowerCase() ?? "";
+    const location = place.location?.toLowerCase() ?? "";
+    const category = place.category?.toLowerCase() ?? "";
+
+    return (
+      title.includes(keyword) ||
+      location.includes(keyword) ||
+      category.includes(keyword)
+    );
+  });
+}
 
     // Category 
-    if (category) {
-      filtered = filtered.filter(
-        (place) => place.category.toLowerCase() === category.toLowerCase()
-      );
-    }
+if (category) {
+  filtered = filtered.filter(
+    (place) =>
+      (place.category ?? "").toLowerCase() === category.toLowerCase()
+  );
+}
 
     // Location
-    if (location) {
-      filtered = filtered.filter((place) =>
-        place.location.toLowerCase().includes(location.toLowerCase())
-      );
-    }
+if (location) {
+  filtered = filtered.filter((place) =>
+    (place.location ?? "").toLowerCase().includes(location.toLowerCase())
+  );
+}
 
     // Price
     if (price) {
