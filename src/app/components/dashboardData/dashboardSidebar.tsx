@@ -47,8 +47,8 @@ const adminMenu: MenuItem[] = [
   { label: "Manage Users", href: "/dashboard/admin/users", icon: Users },
   { label: "Manage Stays", href: "/dashboard/admin/stays", icon: Hotel },
   { label: "Bookings", href: "/dashboard/admin/bookings", icon: CalendarDays },
-  { label: "Transactions", href: "/dashboard/admin/transactions", icon: CreditCard },
-  { label: "Reviews", href: "/dashboard/admin/reviews", icon: MessageSquare },
+  // { label: "Transactions", href: "/dashboard/admin/transactions", icon: CreditCard },
+  // { label: "Reviews", href: "/dashboard/admin/reviews", icon: MessageSquare },
   { label: "Analytics", href: "/dashboard/admin/analytics", icon: BarChart3 },
   { label: "Settings", href: "/dashboard/admin/settings", icon: Settings },
 ];

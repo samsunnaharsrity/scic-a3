@@ -145,7 +145,7 @@ alert("Settings Saved Successfully");
   }
 
   return (
-    <div className="mx-auto mt-10 max-w-4xl p-6">
+    <div className="mx-auto mt-20 max-w-4xl p-6">
       <div className="mb-8 flex items-center gap-4">
         <div className="rounded-2xl bg-blue-600 p-4 text-white">
           <Settings size={30} />
