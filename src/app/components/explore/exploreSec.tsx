@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MapPin, Star, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation"; 
+import { useRouter, useSearchParams } from "next/navigation"; 
 import ExploreFilters from "./exploreFilters";
 import ExploreCard from "./ExploreCard";
 import ExplorePagination from "./ExplorePagination";
@@ -40,6 +40,42 @@ export default function ExploreSection({ limit }: ExploreSectionProps) {
   const [rating, setRating] = useState("");
   const [sort, setSort] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+
+
+
+
+
+const router = useRouter();
+
+const updateURL = useCallback((key: string, value: string) => {
+  const params = new URLSearchParams(searchParams.toString());
+  if (value) params.set(key, value);
+  else params.delete(key);
+
+router.push(`?${params.toString()}`, { scroll: false });
+}, [searchParams, router]);
+
+const handleCategoryChange = (val: string) => {
+  setCategory(val);
+  updateURL("category", val); 
+};
+
+const handleSearchChange = (val: string) => {
+  setSearch(val);
+  updateURL("search", val);
+};
+
+useEffect(() => {
+    setCategory(searchParams.get("category") || "");
+    setSearch(searchParams.get("search") || "");
+    setLocation(searchParams.get("location") || "");
+    setPrice(searchParams.get("price") || "");
+    setRating(searchParams.get("rating") || "");
+    setSort(searchParams.get("sort") || "");
+  }, [searchParams]);
+
+
 
 
   useEffect(() => {
@@ -165,9 +201,9 @@ export default function ExploreSection({ limit }: ExploreSectionProps) {
 
         <ExploreFilters
           search={search}
-          setSearch={setSearch}
+          setSearch={handleSearchChange}
           category={category}
-          setCategory={setCategory}
+          setCategory={handleCategoryChange}
           location={location}
           setLocation={setLocation}
           price={price}
@@ -176,6 +212,7 @@ export default function ExploreSection({ limit }: ExploreSectionProps) {
           setRating={setRating}
           sort={sort}
           setSort={setSort}
+          
         />
 
         {/* Cards */}
