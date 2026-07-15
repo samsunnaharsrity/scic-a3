@@ -25,8 +25,8 @@ const BLOG_POSTS: Record<string, BlogPost> = {
     category: "Luxury Travel",
     date: "July 10, 2026",
     author: "StayNest Team",
-    readTime: "8 min read", // কন্টেন্ট বড় হওয়ায় রিড টাইম বাড়ানো হয়েছে
-    image: "/b-1.jfif",
+    readTime: "8 min read", 
+    image: "/b-1.jpg",
     content: `
       <p>True luxury isn't just about five-star hotels anymore; it's about curated experiences, absolute privacy, and destinations that leave a lasting impact on your soul. This year, the global elite are leaning towards <em>mindful luxury</em>—a beautiful philosophy that combines strict environmental sustainability with world-class comfort and bespoke hospitality.</p>
       
@@ -114,7 +114,7 @@ const BLOG_POSTS: Record<string, BlogPost> = {
     date: "June 25, 2026",
     author: "StayNest Team",
     readTime: "5 min read",
-    image: "/des.jfif",
+    image: "/des.jpg",
     content: `
       <p>As we navigate 2026, travelers are seeking off-the-beaten-path locations over overcrowded tourist traps. Here are the top trending destinations capturing global attention this year.</p>
       
@@ -134,7 +134,7 @@ const BLOG_POSTS: Record<string, BlogPost> = {
     date: "June 18, 2026",
     author: "StayNest Team",
     readTime: "4 min read",
-    image: "/guide.jfif",
+    image: "/guide.jpg",
     content: `
       <p>A bad hotel choice can ruin an otherwise perfect vacation. Finding the right accommodation requires looking beyond the basic price tag and promotional photos.</p>
       
@@ -154,7 +154,7 @@ const BLOG_POSTS: Record<string, BlogPost> = {
     date: "June 10, 2026",
     author: "StayNest Team",
     readTime: "5 min read",
-    image: "/blog1.jfif",
+    image: "/blog1.jpg",
     content: `
       <p>You don't need a million-dollar bank account to travel like a VIP. With smart planning, you can experience premium comfort for a fraction of the cost.</p>
       
@@ -171,7 +171,7 @@ const BLOG_POSTS: Record<string, BlogPost> = {
     date: "May 28, 2026",
     author: "StayNest Team",
     readTime: "4 min read",
-    image: "/adventure.jfif",
+    image: "/adventure.jpg",
     content: `
       <p>Disconnect from the digital noise and reconnect with nature. These premier mountain retreats offer deep isolation paired with ultra-comfortable alpine cabins.</p>
       
@@ -188,7 +188,7 @@ const BLOG_POSTS: Record<string, BlogPost> = {
     date: "May 15, 2026",
     author: "StayNest Team",
     readTime: "5 min read",
-    image: "/family.jfif",
+    image: "/family.jpg",
     content: `
       <p>Planning a trip with kids requires a delicate balance between entertainment for children and relaxation for parents. Here are destinations that cater perfectly to multi-generational travel.</p>
       
@@ -205,7 +205,7 @@ const BLOG_POSTS: Record<string, BlogPost> = {
     date: "May 05, 2026",
     author: "StayNest Team",
     readTime: "6 min read",
-    image: "/plan.jfif",
+    image: "/plan.jpg",
     content: `
       <p>Adventure is worthwhile, but safety is paramount. Traveling confidently in 2026 means being proactive about your digital and physical well-being.</p>
       

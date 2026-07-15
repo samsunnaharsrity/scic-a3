@@ -29,7 +29,7 @@ export default function HomeAbout() {
         <div className="relative">
 
           <Image
-            src="/img3.jfif"
+            src="/img3.jpg"
             alt="About StayNest"
             width={700}
             height={700}

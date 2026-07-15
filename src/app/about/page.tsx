@@ -83,7 +83,7 @@ export default function AboutPage() {
           <div className="relative pt-10">
 
             <Image
-              src="/img3.jfif"
+              src="/img3.jpg"
               alt="About StayNest"
               width={700}
               height={700}
@@ -134,7 +134,7 @@ export default function AboutPage() {
         <div className="grid items-center gap-16 lg:grid-cols-2">
 
           <Image
-            src="/img6.jfif"
+            src="/img6.jpg"
             alt="Our Story"
             width={650}
             height={650}

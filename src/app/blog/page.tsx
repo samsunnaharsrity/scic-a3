@@ -14,7 +14,7 @@ interface BlogItem {
 
 const BLOGS: BlogItem[] = [
   {
-    image: "/des.jfif",
+    image: "/des.jpg",
     category: "Destination",
     title: "Best Places To Travel In 2026",
     desc: "Explore trending destinations, hidden gems and unforgettable travel experiences.",
@@ -22,7 +22,7 @@ const BLOGS: BlogItem[] = [
     slug: "best-places-to-travel-2026",
   },
   {
-    image: "/guide.jfif",
+    image: "/guide.jpg",
     category: "Hotel Guide",
     title: "How To Choose The Perfect Hotel",
     desc: "Learn smart booking tips to find comfortable and luxury stays.",
@@ -30,7 +30,7 @@ const BLOGS: BlogItem[] = [
     slug: "how-to-choose-perfect-hotel",
   },
   {
-    image: "/blog1.jfif",
+    image: "/blog1.jpg",
     category: "Luxury Travel",
     title: "Luxury Travel On A Budget",
     desc: "Enjoy premium experiences without spending more than necessary.",
@@ -38,7 +38,7 @@ const BLOGS: BlogItem[] = [
     slug: "luxury-travel-on-a-budget",
   },
   {
-    image: "/adventure.jfif",
+    image: "/adventure.jpg",
     category: "Adventure",
     title: "Top Mountain Retreats",
     desc: "Discover peaceful mountain locations perfect for your next vacation.",
@@ -46,7 +46,7 @@ const BLOGS: BlogItem[] = [
     slug: "top-mountain-retreats",
   },
   {
-    image: "/family.jfif",
+    image: "/family.jpg",
     category: "Family",
     title: "Family Friendly Destinations",
     desc: "Plan amazing family trips with comfortable accommodations.",
@@ -54,7 +54,7 @@ const BLOGS: BlogItem[] = [
     slug: "family-friendly-destinations",
   },
   {
-    image: "/plan.jfif",
+    image: "/plan.jpg",
     category: "Travel Tips",
     title: "Travel Safety Guide",
     desc: "Essential safety tips every traveler should know before exploring.",
