@@ -115,24 +115,37 @@ const handleLogout = async () => {
   };
 
 
-  useEffect(() => {
-  const fetchSettings = async () => {
+useEffect(() => {
+  const loadSettings = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/settings`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/settings`,
+        {
+          cache: "no-store",
+        }
       );
 
       const data = await res.json();
 
-      if (data.success) {
-        setAppName(data.data.siteName || "StayNest");
+      if (res.ok) {
+        setAppName(data.siteName || data.data?.siteName || "StayNest");
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  fetchSettings();
+  loadSettings();
+
+  const handleSettingsUpdate = () => {
+    loadSettings();
+  };
+
+  window.addEventListener("settingsUpdated", handleSettingsUpdate);
+
+  return () => {
+    window.removeEventListener("settingsUpdated", handleSettingsUpdate);
+  };
 }, []);
 
   return (
@@ -266,7 +279,7 @@ const handleLogout = async () => {
         {/* Footer */}
         <div className="border-t px-6 py-2 text-center border-slate-100 dark:border-neutral-900 bg-slate-50/30 dark:bg-neutral-900/10 shrink-0">
           <p className="text-[11px] font-medium text-slate-400 dark:text-neutral-500">
-            © {new Date().getFullYear()} StayNest LLC.
+            © {new Date().getFullYear()} {appName} LLC.
           </p>
           <p className="text-[9px] font-bold text-slate-300 dark:text-neutral-700 tracking-wider uppercase mt-0.5">
             Hotel Management Console
