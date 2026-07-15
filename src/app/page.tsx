@@ -8,6 +8,7 @@ import FeaturedStays from "./components/featuredStays";
 import TravelBlogs from "./components/travelBlogs";
 import { Suspense } from "react";
 import Footer from "./components/footer";
+import Testimonials from "./components/testimonials";
 
 
 
@@ -22,7 +23,7 @@ export default function Home() {
         <ExploreSection limit={4} />
       </Suspense>
       {/* <FeaturedStays /> */}
-      {/* <Testimonials /> */}
+      <Testimonials />
       <TravelBlogs />
       {/* <Newsletter /> */}
       <Footer></Footer>
