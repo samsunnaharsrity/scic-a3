@@ -57,7 +57,7 @@ export default function ManageStaysPage() {
     type: "Hotel",
     image: "",
     description: "",
-    badge: "Popular",
+    badge: "Nature",
     date: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -388,18 +388,21 @@ export default function ManageStaysPage() {
 <div>
   <label className="block text-sm font-medium">Badge</label>
 
-  <select
-    value={formData.badge}
-    onChange={(e) =>
-      setFormData({ ...formData, badge: e.target.value })
-    }
-    className="mt-1 w-full rounded-xl border p-3 text-sm"
-  >
-    <option value="Popular">Popular</option>
-    <option value="New">New</option>
-    <option value="Trending">Trending</option>
-    <option value="Featured">Featured</option>
-  </select>
+<select
+  value={formData.badge}
+  onChange={(e) =>
+    setFormData({ ...formData, badge: e.target.value })
+  }
+>
+  <option value="Beaches">Beaches</option>
+  <option value="Mountains">Mountains</option>
+  <option value="Historical">Historical</option>
+  <option value="Cities">Cities</option>
+  <option value="Nature">Nature</option>
+  <option value="Camping">Camping</option>
+  <option value="Photography">Photography</option>
+  <option value="Island">Island</option>
+</select>
 </div>
 
 <div>
