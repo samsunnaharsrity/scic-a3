@@ -32,7 +32,7 @@ export default function Hero() {
 <div className="absolute inset-0 z-0 select-none pointer-events-none overflow-hidden">
   {/* Base Background Image */}
   <Image
-    src="/img5.jfif"
+    src="/img5.jpg"
     alt="Luxury Resort"
     fill
     priority
