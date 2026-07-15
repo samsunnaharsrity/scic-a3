@@ -13,21 +13,25 @@ export function DashboardProvider({
 }) {
   const [session, setSession] = useState(initialSession);
 
-  const refreshSession = async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/user/${encodeURIComponent(session.user.email)}`
-    );
+const refreshSession = async () => {
+  if (!session?.user?.email) return;
 
-    const data = await res.json();
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/user/${encodeURIComponent(session.user.email)}`
+  );
 
-    if (data.success) {
-      setSession({
-        ...session,
-        user: data.data,
-      });
-    }
-  };
+  const data = await res.json();
 
+  if (data.success) {
+    setSession((prev: any) => ({
+      ...prev,
+      user: {
+        ...prev.user,
+        ...data.data,
+      },
+    }));
+  }
+};
   return (
     <DashboardContext.Provider
       value={{
